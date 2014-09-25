@@ -1,0 +1,2 @@
+flask
+-e git+https://github.com/jplana/python-etcd.git#egg=etcd

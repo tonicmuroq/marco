@@ -1,0 +1,8 @@
+appname: "macro"
+port: 5000
+runtime: "python"
+build:
+    - "pip install -i http://pypi.douban.com/simple/ ./requirements.txt"
+cmd:
+    - "python app.py"
+static: "macro/static"
