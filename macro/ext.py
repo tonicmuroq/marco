@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import os
+from urlparse import urlparse
 import etcd as petcd
 
 from flask import current_app, _app_ctx_stack
@@ -15,12 +15,12 @@ class Etcd(object):
             self.init_app(app)
 
     def init_app(self, app):
-        app.config.setdefault('ETCD_URI', os.environ['ETCD_URI'])
+        app.config.setdefault('ETCD_URI', 'http://localhost:4001')
 
     def connect(self):
         etcd_uri = current_app.config['ETCD_URI']
-        host, port = etcd_uri.split(':')
-        return petcd.Client(host=host, port=int(port))
+        parsed = urlparse(etcd_uri)
+        return petcd.Client(host=parsed.hostname, port=parsed.port)
 
     @property
     def etcd(self):

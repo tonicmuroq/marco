@@ -23,11 +23,8 @@ def load_config():
 
 
 def create_app():
-    config = load_config()
-    os.environ.update(config)
-
     app = Flask(__name__)
-    app.config.update(config)
+    app.config.update(load_config())
 
     db.init_app(app)
     etcd.init_app(app)
