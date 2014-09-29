@@ -1,2 +1,3 @@
 flask
 -e git+https://github.com/jplana/python-etcd.git#egg=etcd
+-e git+https://github.com/tonicbupt/flask-navigator.git#egg=flask_navigator

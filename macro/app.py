@@ -7,9 +7,11 @@ from flask import Flask
 from werkzeug.utils import import_string
 
 from macro.ext import db, etcd
+from macro.views.navigator import init_nav
 
 
 blueprints = (
+    'index',
     'containers',
 )
 
@@ -23,11 +25,12 @@ def load_config():
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/macro/static')
     app.config.update(load_config())
 
     db.init_app(app)
     etcd.init_app(app)
+    init_nav(app)
 
     for bp in blueprints:
         import_name = '%s.views.%s:bp' % (__package__, bp)

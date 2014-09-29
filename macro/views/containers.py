@@ -32,3 +32,8 @@ def containers(app, host):
 def get_container(cid):
     c = Container.get_by_container_id(cid)
     return str(c)
+
+@bp.route('/hosts')
+def all_hosts():
+    from macro.models.host import Host
+    return str(Host.all_hosts())

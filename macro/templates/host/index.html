@@ -1,0 +1,17 @@
+{% extends "/base.html" %}
+
+{% block title %}
+  Macro Hosts
+{% endblock %}
+
+{% block main %}
+  {% for host in hosts %}
+    <div class="col-xs-6 col-md-3">
+      <a href="{{ url_for('host.host_info', host_id=host.id) }}" class="thumbnail btn btn-success">
+        <div class="caption">
+          {{ host.ip }}
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+{% endblock %}
