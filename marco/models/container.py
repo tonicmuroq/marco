@@ -2,7 +2,7 @@
 
 from werkzeug import cached_property
 
-from macro.ext import db, etcd
+from marco.ext import db, etcd
 from .base import Base
 
 

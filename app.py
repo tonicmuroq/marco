@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from macro.app import create_app
+from marco.app import create_app
 
 app = create_app()
 

@@ -4,9 +4,9 @@ import os
 import yaml
 from flask import Blueprint, jsonify, current_app
 
-from macro.ext import etcd
-from macro.models import Container
-from macro.utils import yaml_loads
+from marco.ext import etcd
+from marco.models import Container
+from marco.utils import yaml_loads
 
 
 bp = Blueprint('container', __name__, url_prefix='/container')
@@ -35,5 +35,5 @@ def get_container(cid):
 
 @bp.route('/hosts')
 def all_hosts():
-    from macro.models.host import Host
+    from marco.models.host import Host
     return str(Host.all_hosts())

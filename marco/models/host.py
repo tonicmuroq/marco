@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from macro.ext import db
+from marco.ext import db
 from .base import Base
 
 

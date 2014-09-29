@@ -3,7 +3,7 @@
 from sqlalchemy.inspection import inspect
 from sqlalchemy.ext.declarative import declared_attr
 
-from macro.ext import db
+from marco.ext import db
 
 
 class Base(db.Model):

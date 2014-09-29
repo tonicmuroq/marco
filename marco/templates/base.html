@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le styles -->
-    <link href="/macro/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/marco/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     {% block more_header %}{% endblock %}
     <style>
       .bs-docs-container {margin-top:20px;}
@@ -30,7 +30,7 @@
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
           <ul class="nav navbar-nav">
-            {% for item in nav.macro_nav%}
+            {% for item in nav.marco_nav%}
               <li class="{{'active' if item.is_active else ''}}">
                 <a href="{{item.url}}">{{item.label}}</a>
               </li>
@@ -71,8 +71,8 @@
 
     <!-- Le javascript ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/macro/static/js/jquery-2.1.1.min.js"></script>
-    <script src="/macro/static/js/bootstrap.min.js"></script>
+    <script src="/marco/static/js/jquery-2.1.1.min.js"></script>
+    <script src="/marco/static/js/bootstrap.min.js"></script>
     {% block bottom_script %}{% endblock %}
     <!-- COLLECTED JS -->
   </body>

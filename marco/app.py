@@ -6,8 +6,8 @@ import yaml
 from flask import Flask
 from werkzeug.utils import import_string
 
-from macro.ext import db, etcd
-from macro.views.navigator import init_nav
+from marco.ext import db, etcd
+from marco.views.navigator import init_nav
 
 
 blueprints = (
@@ -25,7 +25,7 @@ def load_config():
 
 
 def create_app():
-    app = Flask(__name__, static_url_path='/macro/static')
+    app = Flask(__name__, static_url_path='/marco/static')
     app.config.update(load_config())
 
     db.init_app(app)

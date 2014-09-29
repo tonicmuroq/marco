@@ -1,8 +1,8 @@
-appname: "macro"
+appname: "marco"
 port: 5000
 runtime: "python"
 build:
-    - "pip install -i http://pypi.douban.com/simple/ ./requirements.txt"
+    - "apt-get install -y libssl-dev libffi-dev && pip install -r ./requirements.txt"
 cmd:
     - "python app.py"
-static: "macro/static"
+static: "marco/static"

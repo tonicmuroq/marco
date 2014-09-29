@@ -1,3 +1,6 @@
-flask
--e git+https://github.com/jplana/python-etcd.git#egg=etcd
--e git+https://github.com/tonicbupt/flask-navigator.git#egg=flask_navigator
+Flask
+PyYAML
+Flask-SQLAlchemy
+MySQL-python
+-e git+http://git.hunantv.com/mirror/python-etcd.git#egg=etcd
+-e git+http://git.hunantv.com/tonic/flask-navigator.git#egg=flask_navigator
