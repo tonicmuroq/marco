@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from sqlalchemy import distinct
 from werkzeug import cached_property
 
 from marco.ext import db, etcd
@@ -18,6 +19,20 @@ class Application(Base):
     @classmethod
     def get_by_name_and_version(cls, name, version):
         return db.session.query(cls).filter(cls.name == name, cls.version == version).first()
+
+    @classmethod
+    def get_all_app_names(cls, limit=None):
+        q = db.session.query(cls.name).distinct(cls.name).order_by(cls.name.asc())
+        if limit is not None:
+            q = q.limit(limit)
+        return [r for r, in q.all()]
+
+    @classmethod
+    def get_multi(cls, name, limit=None):
+        q = db.session.query(cls).filter(cls.name == name).order_by(cls.name.asc())
+        if limit is not None:
+            q = q.limit(limit)
+        return q.all()
 
     @classmethod
     def get(cls, id):
@@ -43,3 +58,13 @@ class Application(Base):
     @cached_property
     def original_config_yaml(self):
         return self.get_yaml('original-config.yaml')
+
+    @cached_property
+    def n_container(self):
+        from .container import Container
+        return len(Container.get_multi(app_id=self.id))
+
+    @cached_property
+    def containers(self):
+        from .container import Container
+        return Container.get_multi(app_id=self.id)

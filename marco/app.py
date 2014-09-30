@@ -13,6 +13,7 @@ from marco.views.navigator import init_nav
 blueprints = (
     'index',
     'containers',
+    'application',
 )
 
 

@@ -21,8 +21,10 @@ class Container(Base):
         return db.session.query(cls).filter(cls.container_id.like('%s%%' % cid)).first()
 
     @classmethod
-    def get_multi(cls, host_id, app_id=None):
-        q = db.session.query(cls).filter(cls.host_id == host_id)
+    def get_multi(cls, host_id=None, app_id=None):
+        q = db.session.query(cls)
+        if host_id is not None:
+            q = q.filter(cls.host_id == host_id)
         if app_id is not None:
             q = q.filter(cls.app_id == app_id)
         return q.order_by(cls.app_id.asc()).all()

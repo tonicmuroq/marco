@@ -1,0 +1,75 @@
+{% macro paginator(start, total, perpage, endpoint) %}
+
+  {% set cur_page = start // perpage + 1 %}
+  {% set total_page = total // perpage + 1 %}
+  {% set begin = max(cur_page-3, 1) %}
+  {% set end = min(cur_page+3, total_page) %}
+  {% set prev = 'disabled' if cur_page <=1 else '' %}
+  {% set next = 'disabled' if cur_page >= total_page else '' %}
+  {% set prev_num = max((cur_page-2)*perpage, 0) %}
+  {% set kw = paginator_kwargs(kwargs) %}
+
+  {% if total > 0 %}
+    <ul class="pagination">
+      <li class="{{prev}}"><a href="{{url_for(endpoint, start=prev_num, limit=perpage, **kw)}}">&laquo;</a></li>
+        {% for i in range(begin, end+1) %}
+          <li class="{{'active' if cur_page == i else ''}}">
+            <a href="{{url_for(endpoint, start=(i-1)*perpage, limit=perpage, **kw)}}">{{i}}</a>
+          </li>
+        {% endfor %}
+      <li class="{{next}}"><a href="{{url_for(endpoint, start=cur_page*perpage, limit=perpage, **kw)}}">&raquo;</a></li>
+    </ul>
+  {% endif %}
+
+{% endmacro %}
+
+{% macro _error_display_in_form(outer_style, inner_style) %}
+  {% with errors = get_flashed_messages(category_filter=['error'])%}
+    {% if errors %}
+      <div class="{{outer_style}}">
+        <div class="{{inner_style}}">
+          {{caller(errors)}} 
+        </div>
+      </div>
+    {% endif %}
+  {% endwith %}
+{% endmacro %}
+
+{% macro error_display_in_form(outer_style, inner_style) %}
+  {% call(errors) _error_display_in_form(outer_style, inner_style) %}
+    {% if errors %}
+      {% for error in errors %}
+        <div class="alert alert-danger">
+          {{error}}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endcall %}
+{% endmacro %}
+
+{% macro containers_block(containers) %}
+  <div class="container">
+    {% for container in containers %}
+      <div class="col-xs-6 col-md-4">
+        <a href="{{ url_for('container.container', cid=container.container_id) }}" class="thumbnail btn btn-success">
+          <div class="caption">
+            <dl class="dl-horizontal">
+              <dt>容器ID</dt>
+              <dd>{{ container.container_id[:7] }}</dd>
+              <dt>对内端口</dt>
+              <dd>{{ container.port }}</dd>
+              <dt>应用名称</dt>
+              <dd>{{ container.application.name }}</dd>
+              <dt>应用版本</dt>
+              <dd>{{ container.application.version }}</dd>
+              <dt>DaemonID</dt>
+              <dd>{{ container.daemon_id or '-' }}</dd>
+            </dl>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{# vim:set ft=jinja: #}

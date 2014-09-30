@@ -9,6 +9,7 @@ def _init_nav(nav):
 
     nav.Bar('marco_nav', [
         nav.Item(u'机器', 'host.index', sub_nav_bar=host_sub_nav),
+        nav.Item(u'应用', 'app.index'),
     ])
 
 def init_nav(app):

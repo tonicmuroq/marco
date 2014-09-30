@@ -29,11 +29,6 @@ def containers(app, host):
 
 
 @bp.route('/<cid>')
-def get_container(cid):
+def container(cid):
     c = Container.get_by_container_id(cid)
     return str(c)
-
-@bp.route('/hosts')
-def all_hosts():
-    from marco.models.host import Host
-    return str(Host.all_hosts())

@@ -1,0 +1,20 @@
+{% extends "/base.html" %}
+
+{% block title %}
+  Marco Applications
+{% endblock %}
+
+{% block main %}
+  {% for app_name in app_names %}
+    <div class="col-xs-6 col-md-4">
+      <a href="{{ url_for('app.app_set_info', name=app_name) }}" class="thumbnail btn btn-success">
+        <div class="caption">
+          <dl class="dl-horizontal">
+              <dt>应用名</dt>
+              <dd>{{ app_name }}</dd>
+          </dl>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+{% endblock %}
