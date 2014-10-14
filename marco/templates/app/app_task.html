@@ -1,0 +1,25 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block title %}
+  Marco Applications
+{% endblock %}
+
+{% block main %}
+  <div class="app-block">
+    <dl class="dl-horizontal">
+      {% for task in tasks %}
+        <dt>AppId</dt>
+        <dd>{{ task.app_id }}</dd>
+        <dt>Status</dt>
+        <dd>{{ 'Running' if task.status == 0 else 'Done' }}</dd>
+        <dt>Result</dt>
+        <dd>{{ task.result }}</dd>
+        <dt>Kind</dt>
+        <dd>{{ task.kind }}</dd>
+      {% endfor %}
+    </dl>
+  </div>
+{% endblock %}
+
+{# vim:set ft=jinja: #}

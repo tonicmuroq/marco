@@ -18,6 +18,9 @@
       <dd>{{ app.original_config_yaml.replace('\n', '<br/>') | safe }}</dd>
     </dl>
   </div>
+  <div class="app-running">
+    {{ '在跑呢!' if app.is_doing_task() else '可以跑别的了' }}
+  </div>
   <div class="app-block">
     {{ utils.containers_block(app.containers) }}
   </div>

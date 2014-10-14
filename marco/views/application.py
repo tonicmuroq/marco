@@ -26,3 +26,12 @@ def app_info(name, version):
     if not app:
         abort(404)
     return render_template('/app/app.html', app=app)
+
+
+@bp.route('/<name>/<version>/tasks')
+def app_tasks(name, version):
+    app = Application.get_by_name_and_version(name, version)
+    if not app:
+        abort(404)
+    tasks = app.tasks()
+    return render_template('/app/app_task.html', app=app, tasks=tasks)

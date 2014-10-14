@@ -3,7 +3,8 @@
 from werkzeug import cached_property
 
 from marco.ext import db, etcd
-from .base import Base
+from marco.models.consts import TaskStatus
+from marco.models.base import Base
 
 
 class Application(Base):
@@ -78,3 +79,11 @@ class Application(Base):
         from .host import Host
         host_ids = list(set(c.host_id for c in self.containers))
         return filter(None, [Host.get(i) for i in host_ids])
+
+    def tasks(self, status=None, succ=None, start=0, limit=20):
+        from .task import StoredTask
+        return StoredTask.get_multi(self.id, status, succ)
+
+    def is_doing_task(self):
+        running_tasks = self.tasks(status=TaskStatus.Running, limit=1)
+        return len(running_tasks) > 0
