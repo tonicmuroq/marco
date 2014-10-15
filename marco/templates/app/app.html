@@ -18,12 +18,23 @@
       <dd>{{ app.original_config_yaml.replace('\n', '<br/>') | safe }}</dd>
     </dl>
   </div>
-  <div class="app-running">
-    {{ '在跑呢!' if app.is_doing_task() else '可以跑别的了' }}
-  </div>
+
+  {% if app.is_doing_task() %}
+    <div class="alert alert-warning" role="alert">正在执行任务</div>
+  {% else %}
+    <div class="alert alert-success" role="alert">没有正在执行的任务</div>
+  {% endif %}
+
+  <button type="button" class="btn btn-primary btn-add-container" data-url="{{ url_for('app.app_add_container', name=app.name, version=app.version) }}">来我们加一个container</button>
+  <button type="button" class="btn btn-danger btn-remove-container" data-url="{{ url_for('app.app_remove_app', name=app.name, version=app.version) }}">来我们下掉这个应用</button>
+
   <div class="app-block">
     {{ utils.containers_block(app.containers) }}
   </div>
+{% endblock %}
+
+{% block bottom_script %}
+  <script type="text/javascript" src="/marco/static/js/app.js"></script>
 {% endblock %}
 
 {# vim:set ft=jinja: #}

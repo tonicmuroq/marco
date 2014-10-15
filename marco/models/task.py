@@ -14,6 +14,8 @@ class StoredTask(Base):
     succ = db.Column(db.Integer, nullable=False)
     kind = db.Column(db.Integer, nullable=False)
     result = db.Column(db.String(255))
+    created = db.Column(db.DateTime)
+    finished = db.Column(db.DateTime)
 
     @classmethod
     def get_multi(cls, app_id, status=None, succ=None, start=0, limit=20):

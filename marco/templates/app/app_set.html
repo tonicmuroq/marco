@@ -5,20 +5,43 @@
 {% endblock %}
 
 {% block main %}
-  {% for app in apps %}
-    <div class="col-xs-6 col-md-3">
-      <a href="{{ url_for('app.app_info', name=app.name, version=app.version) }}" class="thumbnail btn btn-success">
-        <div class="caption">
-          <dl class="dl-horizontal">
-              <dt>应用名</dt>
-              <dd>{{ app.name }}</dd>
-              <dt>版本号</dt>
-              <dd>{{ app.version }}</dd>
-              <dt>容器数量</dt>
-              <dd>{{ app.n_container }}</dd>
-          </dl>
-        </div>
-      </a>
-    </div>
-  {% endfor %}
+  {{ app_table([latest,], "最新版本") }}
+  {{ app_table(online_apps, "在线版本") }}
+  {{ app_table(apps, "所有版本") }}
 {% endblock %}
+
+{% macro app_table(apps, title) %}
+  <h3 class="page-header">{{ title }}</h3>
+  <div class="latest">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>应用名</th>
+          <th>版本号</th>
+          <th>创建时间</th>
+          <th>项目名</th>
+          <th>容器数</th>
+          <th>相关任务</th>
+          <th>more</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in apps %}
+          <tr>
+            <td><a href="{{ url_for('app.app_info', name=app.name, version=app.version) }}">{{ app.name }}</a></td>
+            <td>{{ app.version }}</td>
+            <td>{{ app.created }}</td>
+            <td><a href="{{ app.git_repo_url() }}" target="_blank">{{ app.pname }}</a></td>
+            <td>{{ app.n_container }}</td>
+            <td>{{ 'Y' if app.is_doing_task() else 'N' }}</td>
+            <td>
+              <a href="{{ app.online_url() }}" target="_blank">
+                <i class="glyphicon glyphicon-circle-arrow-right"></i>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endmacro %}

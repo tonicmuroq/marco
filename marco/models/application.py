@@ -6,6 +6,8 @@ from marco.ext import db, etcd
 from marco.models.consts import TaskStatus
 from marco.models.base import Base
 
+from marco.utils import yaml_loads
+
 
 class Application(Base):
 
@@ -14,7 +16,9 @@ class Application(Base):
     name = db.Column(db.String(255), nullable=False)
     version = db.Column(db.String(255), nullable=False)
     pname = db.Column(db.String(255), nullable=False)
+    group = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
+    created = db.Column(db.DateTime)
 
     @classmethod
     def get_by_name_and_version(cls, name, version):
@@ -24,7 +28,7 @@ class Application(Base):
     @classmethod
     def get_all_app_names(cls, start=0, limit=20):
         '''取所有的应用名字, 从start开始取limit个'''
-        q = db.session.query(cls.name).distinct(cls.name).order_by(cls.name.asc()).offset(start)
+        q = db.session.query(cls.name).distinct(cls.name).order_by(cls.id.desc()).offset(start)
         if limit is not None:
             q = q.limit(limit)
         return [r for r, in q.all()]
@@ -32,7 +36,7 @@ class Application(Base):
     @classmethod
     def get_multi(cls, name, start=0, limit=20):
         '''按照名字取应用列表, 从start开始取limit个'''
-        q = db.session.query(cls).filter(cls.name == name).order_by(cls.name.asc()).offset(start)
+        q = db.session.query(cls).filter(cls.name == name).order_by(cls.id.desc()).offset(start)
         if limit is not None:
             q = q.limit(limit)
         return q.all()
@@ -80,6 +84,10 @@ class Application(Base):
         host_ids = list(set(c.host_id for c in self.containers))
         return filter(None, [Host.get(i) for i in host_ids])
 
+    def is_daemon(self):
+        y = yaml_loads(self.app_yaml)
+        return y['daemon']
+
     def tasks(self, status=None, succ=None, start=0, limit=20):
         from .task import StoredTask
         return StoredTask.get_multi(self.id, status, succ)
@@ -87,3 +95,9 @@ class Application(Base):
     def is_doing_task(self):
         running_tasks = self.tasks(status=TaskStatus.Running, limit=1)
         return len(running_tasks) > 0
+
+    def git_repo_url(self):
+        return 'http://git.hunantv.com/{self.group}/{self.pname}'.format(self=self)
+
+    def online_url(self):
+        return 'http://{self.name}.intra.hunantv.com'.format(self=self)
