@@ -28,7 +28,7 @@ class Application(Base):
     @classmethod
     def get_all_app_names(cls, start=0, limit=20):
         '''取所有的应用名字, 从start开始取limit个'''
-        q = db.session.query(cls.name).distinct(cls.name).order_by(cls.id.desc()).offset(start)
+        q = db.session.query(cls.name).distinct(cls.name).order_by(cls.name.asc()).offset(start)
         if limit is not None:
             q = q.limit(limit)
         return [r for r, in q.all()]
