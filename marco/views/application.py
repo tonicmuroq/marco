@@ -103,7 +103,7 @@ def app_remove_app(name, version):
     app = Application.get_by_name_and_version(name, version)
     if not app:
         return jsonify({"r": 1, "msg": "no such app"})
-    if app.name == 'marco' and app.n_container <= 1:
+    if app.name == 'marco':
         return jsonify({"r": 1, "msg": "marco 不能下光!"})
     if app.is_doing_task():
         return jsonify({"r": 1, "msg": "正在执行其他任务"})
