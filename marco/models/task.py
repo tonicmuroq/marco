@@ -2,7 +2,18 @@
 
 from marco.ext import db
 
-from .base import Base
+from marco.models.consts import TaskType, TaskStatus
+from marco.models.base import Base
+
+
+repr_dict = {
+    TaskType.AddContainer: u'增加容器',
+    TaskType.RemoveContainer: u'下线容器',
+    TaskType.UpdateContainer: u'更新容器',
+    TaskType.BuildImage: u'构建镜像',
+    TaskType.TestApplication: u'测试应用',
+    TaskType.HostInfo: u'请求host信息',
+}
 
 
 class StoredTask(Base):
@@ -28,3 +39,10 @@ class StoredTask(Base):
         if limit is not None:
             q = q.limit(limit)
         return q.all()
+
+    def processing(self):
+        return self.status == TaskStatus.Running.value
+
+    def repr(self):
+        time_str = self.created.strftime('%Y-%m-%d %H:%M:%S')
+        return '%s: %s' % (time_str, repr_dict[TaskType(self.kind)])

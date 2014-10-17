@@ -11,8 +11,13 @@
 
 {% block main_right %}
 
-  {% if app.is_doing_task() %}
-    <div class="alert alert-warning" role="alert">正在执行任务</div>
+  {% if ptasks %}
+    <div class="alert alert-warning" role="alert">
+      正在执行任务:
+      {% for ptask in ptasks %}
+        <p>{{ptask.repr()}}</p>
+      {% endfor %}
+    </div>
   {% else %}
     <div class="alert alert-success" role="alert">没有正在执行的任务</div>
   {% endif %}

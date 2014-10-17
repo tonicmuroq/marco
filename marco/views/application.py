@@ -30,9 +30,10 @@ def app_set_info(name):
 @bp.route('/<name>/<version>/')
 def app_info(name, version):
     app = Application.get_by_name_and_version(name, version)
+    ptasks = app.processing_tasks(limit=5)
     if not app:
         abort(404)
-    return render_template('/app/app.html', app=app)
+    return render_template('/app/app.html', app=app, ptasks=ptasks)
 
 
 @bp.route('/<name>/<version>/tasks')
@@ -54,7 +55,7 @@ def app_add_container(name, version):
     app = Application.get_by_name_and_version(name, version)
     if not app:
         return jsonify({"r": 1, "msg": "no such app"})
-    if app.is_doing_task():
+    if app.processing():
         return jsonify({"r": 1, "msg": "正在执行其他任务"})
     r = add_container(app, host)
     return jsonify(r)
@@ -71,7 +72,7 @@ def app_build_image(name, version):
     app = Application.get_by_name_and_version(name, version)
     if not app:
         return jsonify({"r": 1, "msg": "no such app"})
-    if app.is_doing_task():
+    if app.processing():
         return jsonify({"r": 1, "msg": "正在执行其他任务"})
     r = build_image(app, host, base)
     return jsonify(r)
@@ -87,7 +88,7 @@ def app_test_app(name, version):
     app = Application.get_by_name_and_version(name, version)
     if not app:
         return jsonify({"r": 1, "msg": "no such app"})
-    if app.is_doing_task():
+    if app.processing():
         return jsonify({"r": 1, "msg": "正在执行其他任务"})
     r = test_app(app, host)
     return jsonify(r)
@@ -105,7 +106,7 @@ def app_remove_app(name, version):
         return jsonify({"r": 1, "msg": "no such app"})
     if app.name == 'marco':
         return jsonify({"r": 1, "msg": "marco 不能下光!"})
-    if app.is_doing_task():
+    if app.processing():
         return jsonify({"r": 1, "msg": "正在执行其他任务"})
     r = remove_app(app, host)
     return jsonify(r)

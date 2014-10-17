@@ -112,7 +112,7 @@
         <span class="label label-success">version: {{app.version}}</span>
         <span class="label label-success">time: {{app.created}}</span>
         <span class="label label-success">container: {{app.n_container}}</span>
-        {% if app.is_doing_task() %}
+        {% if app.processing() %}
           <span class="label label-warning">正在执行任务</span>
         {% else %}
           <span class="label label-info">等待任务</span>

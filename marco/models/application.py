@@ -92,9 +92,11 @@ class Application(Base):
         from .task import StoredTask
         return StoredTask.get_multi(self.id, status, succ)
 
-    def is_doing_task(self):
-        running_tasks = self.tasks(status=TaskStatus.Running, limit=1)
-        return len(running_tasks) > 0
+    def processing_tasks(self, start=0, limit=20):
+        return self.tasks(status=TaskStatus.Running, start=start, limit=limit)
+
+    def processing(self):
+        return len(self.processing_tasks(limit=1)) > 0
 
     def git_repo_url(self):
         return 'http://git.hunantv.com/{self.group}/{self.pname}'.format(self=self)
