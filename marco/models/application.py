@@ -86,7 +86,7 @@ class Application(Base):
 
     def is_daemon(self):
         y = yaml_loads(self.app_yaml)
-        return y['daemon']
+        return y.get('daemon', False)
 
     def tasks(self, status=None, succ=None, start=0, limit=20):
         from .task import StoredTask

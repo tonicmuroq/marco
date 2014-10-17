@@ -5,19 +5,11 @@
   Marco Applications
 {% endblock %}
 
-{% block main %}
-  <div class="app-block">
-    <dl class="dl-horizontal">
-      <dt>Name</dt>
-      <dd>{{ app.name }}</dd>
-      <dt>Version</dt>
-      <dd>{{ app.version }}</dd>
-      <dt>app.yaml</dt>
-      <dd>{{ app.app_yaml.replace('\n', '<br/>') | safe }}</dd>
-      <dt>config.yaml</dt>
-      <dd>{{ app.original_config_yaml.replace('\n', '<br/>') | safe }}</dd>
-    </dl>
-  </div>
+{% block main_left %}
+  {{utils.left_bar(nav.app_sub_nav)}}
+{% endblock %}
+
+{% block main_right %}
 
   {% if app.is_doing_task() %}
     <div class="alert alert-warning" role="alert">正在执行任务</div>
@@ -25,12 +17,25 @@
     <div class="alert alert-success" role="alert">没有正在执行的任务</div>
   {% endif %}
 
-  <button type="button" class="btn btn-primary btn-add-container" data-url="{{ url_for('app.app_add_container', name=app.name, version=app.version) }}">来我们加一个container</button>
-  <button type="button" class="btn btn-danger btn-remove-container" data-url="{{ url_for('app.app_remove_app', name=app.name, version=app.version) }}">来我们下掉这个应用</button>
+  <div class="text-left">
+    <button type="button" class="btn btn-info btn-build-image" data-url="{{url_for('app.app_build_image', name=app.name, version=app.version)}}">构建镜像</button>
+    <button type="button" class="btn btn-info btn-test-app" data-url="{{url_for('app.app_test_app', name=app.name, version=app.version)}}">测试应用</button>
+    <button type="button" class="btn btn-info btn-add-container" data-url="{{url_for('app.app_add_container', name=app.name, version=app.version)}}">增加容器</button>
+    <button type="button" class="btn btn-danger btn-remove-container" data-url="{{url_for('app.app_remove_app', name=app.name, version=app.version)}}">下线应用</button>
+  </div>
 
   <div class="app-block">
-    {{ utils.containers_block(app.containers) }}
+    {{utils.containers_list(app.containers)}}
   </div>
+  <div class="text-right">
+      <button class="btn btn-warning btn-collect-all">选择全部</button>
+      <button class="btn btn-warning btn-remove-containers disabled" data-url="{{url_for('container.remove_containers')}}">下线所选容器</button>
+  </div>
+{% endblock %}
+
+{% block more_css %}
+  .app-block { padding-top: 20px; }
+  .container-check { position: absolute; border-right: 1px solid #ddd; padding: 0 12px; left: 0; }
 {% endblock %}
 
 {% block bottom_script %}

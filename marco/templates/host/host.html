@@ -2,9 +2,13 @@
 {% import "/utils.html" as utils %}
 
 {% block title %}
-  Containers on {{ host.ip }}
+  Containers on {{host.ip}}
 {% endblock %}
 
-{% block main %}
-  {{ utils.containers_block(containers) }}
+{% block main_left %}
+  {{utils.left_bar(nav.host_sub_nav)}}
+{% endblock %}
+
+{% block main_right %}
+  {{utils.containers_list(containers, show_check=False)}}
 {% endblock %}

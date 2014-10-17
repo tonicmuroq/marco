@@ -1,12 +1,12 @@
 # coding: utf-8
 
 import os
-import yaml
-from flask import Blueprint, jsonify, current_app
+from flask import Blueprint, jsonify, current_app, request
 
 from marco.ext import etcd
 from marco.models import Container
 from marco.utils import yaml_loads
+from marco.actions import remove_container
 
 
 bp = Blueprint('container', __name__, url_prefix='/container')
@@ -28,7 +28,18 @@ def containers(app, host):
     return jsonify({'r': 0, 'containers': containers})
 
 
-@bp.route('/<cid>')
+@bp.route('/<cid>', methods=['GET', 'POST'])
 def container(cid):
     c = Container.get_by_container_id(cid)
     return str(c)
+
+
+@bp.route('/remove', methods=['POST'])
+def remove_containers():
+    cids = request.form.getlist('cids[]')
+    if not cids:
+        return jsonify({"r": 1, "msg": "no containers"})
+    cs = [Container.get_by_container_id(cid) for cid in cids]
+    for c in filter(None, cs):
+        remove_container(c)
+    return jsonify({"r": 0, "msg": "ok"})

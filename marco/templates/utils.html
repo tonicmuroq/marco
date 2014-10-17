@@ -47,6 +47,14 @@
   {% endcall %}
 {% endmacro %}
 
+{% macro left_bar(navigator) %}
+  <div class="list-group">
+    {% for item in navigator %}
+    <a href="{{item.url}}" class="list-group-item {{'active' if item.is_active else ''}}">{{item.label}}</a>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
 {% macro containers_block(containers) %}
   <div class="container">
     {% for container in containers %}
@@ -72,4 +80,46 @@
   </div>
 {% endmacro %}
 
+{% macro containers_list(containers, show_check=True) %}
+  <div class="list-group container-list">
+    <li class="list-group-item list-group-item-info">容器列表</li>
+    {% for container in containers %}
+      <a class="list-group-item" href="{{url_for('container.container', cid=container.container_id)}}">
+        {% if show_check %}
+          <div class="container-check">
+            <input type="checkbox" class="check-container" data-cid="{{container.container_id}}"></input>
+          </div>
+          <span class="label label-success" style="margin-left: 36px;">name: {{container.application.name}}</span>
+        {% else %}
+          <span class="label label-success">name: {{container.application.name}}</span>
+        {% endif %}
+        <span class="label label-success">version: {{container.application.version}}</span>
+        <span class="label label-success">host: {{container.host.ip}}</span>
+        <span class="label label-success">port: {{container.port}}</span>
+        <span class="glyphicon glyphicon-cloud-download"></span>
+        {{container.container_id[:7]}} [ {{container.application.name}} ]
+      </a>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro app_list(apps, title) %}
+  <div class="list-group app-list">
+    <li class="list-group-item list-group-item-info">{{title}}</li>
+    {% for app in apps %}
+      <a class="list-group-item" href="{{url_for('app.app_info', name=app.name, version=app.version)}}">
+        <span class="label label-success">name: {{app.name}}</span>
+        <span class="label label-success">version: {{app.version}}</span>
+        <span class="label label-success">time: {{app.created}}</span>
+        <span class="label label-success">container: {{app.n_container}}</span>
+        {% if app.is_doing_task() %}
+          <span class="label label-warning">正在执行任务</span>
+        {% else %}
+          <span class="label label-info">等待任务</span>
+        {% endif %}
+        {{app.name}}
+      </a>
+    {% endfor %}
+  </div>
+{% endmacro %}
 {# vim:set ft=jinja: #}

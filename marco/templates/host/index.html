@@ -1,17 +1,20 @@
 {% extends "/base.html" %}
+{% import "/utils.html" as utils %}
 
-{% block title %}
-  Marco Hosts
+{% block main_left %}
+  {{utils.left_bar(nav.host_sub_nav)}}
 {% endblock %}
 
-{% block main %}
-  {% for host in hosts %}
-    <div class="col-xs-6 col-md-3">
-      <a href="{{ url_for('host.host_info', host_id=host.id) }}" class="thumbnail btn btn-success">
-        <div class="caption">
-          {{ host.ip }}
-        </div>
-      </a>
-    </div>
-  {% endfor %}
+{% block main_right %}
+  <div class="list-group">
+    <li class="list-group-item list-group-item-info">机器列表</li>
+    {% for host in hosts %}
+      <li class="list-group-item">
+        <span class="glyphicon glyphicon-leaf"></span>
+        <a href="{{url_for('host.host_info', host_id=host.id)}}">
+          {{host.ip}}
+        </a>
+      </li>
+    {% endfor %}
+  </div>
 {% endblock %}

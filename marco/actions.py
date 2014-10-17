@@ -10,6 +10,13 @@ API_FORMATS = {
     'build_image': '/app/{app.name}/{app.version}/build',
     'test_app': '/app/{app.name}/{app.version}/test',
     'remove_app': '/app/{app.name}/{app.version}/remove',
+    'remove_container': '/container/{container.container_id}/remove',
+}
+
+
+_error = {
+    'r': 1,
+    'msg': '在执行其他任务呢',
 }
 
 
@@ -43,4 +50,11 @@ def remove_app(app, host):
     url = urljoin(target_url, API_FORMATS['remove_app'].format(app=app))
     data = {'host': host.ip}
     r = requests.post(url, data)
+    return r.json()
+
+
+def remove_container(container):
+    target_url = current_app.config['DOT_URL']
+    url = urljoin(target_url, API_FORMATS['remove_container'].format(container=container))
+    r = requests.post(url)
     return r.json()

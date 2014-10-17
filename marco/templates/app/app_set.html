@@ -1,48 +1,16 @@
 {% extends "/base.html" %}
+{% import "/utils.html" as utils %}
 
 {% block title %}
   Marco Applications
 {% endblock %}
 
-{% block main %}
-  {{ app_table([latest,], "最新版本") }}
-  {{ app_table(online_apps, "在线版本") }}
-  {{ app_table(apps, "所有版本") }}
+{% block main_left %}
+  {{utils.left_bar(nav.app_sub_nav)}}
 {% endblock %}
 
-{% macro app_table(apps, title) %}
-  <h3 class="page-header">{{ title }}</h3>
-  <div class="latest">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>应用名</th>
-          <th>版本号</th>
-          <th>创建时间</th>
-          <th>项目名</th>
-          <th>容器数</th>
-          <th>相关任务</th>
-          <th>more</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app in apps %}
-          <tr>
-            <td><a href="{{ url_for('app.app_info', name=app.name, version=app.version) }}">{{ app.name }}</a></td>
-            <td>{{ app.version }}</td>
-            <td>{{ app.created }}</td>
-            <td><a href="{{ app.git_repo_url() }}" target="_blank">{{ app.pname }}</a></td>
-            <td>{{ app.n_container }}</td>
-            <td>{{ 'Y' if app.is_doing_task() else 'N' }}</td>
-            <td>
-              <a href="{{ app.online_url() }}" target="_blank">
-                <i class="glyphicon glyphicon-circle-arrow-right"></i>
-                去看看
-              </a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-{% endmacro %}
+{% block main_right %}
+  {{ utils.app_list([latest,], "最新版本") }}
+  {{ utils.app_list(online_apps, "在线版本") }}
+  {{ utils.app_list(apps, "所有版本") }}
+{% endblock %}

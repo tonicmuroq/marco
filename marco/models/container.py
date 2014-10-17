@@ -33,3 +33,8 @@ class Container(Base):
     def application(self):
         from .application import Application
         return Application.get(self.app_id)
+
+    @cached_property
+    def host(self):
+        from .host import Host
+        return Host.get(self.host_id)
