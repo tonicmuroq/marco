@@ -1,0 +1,31 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block title %}
+  Marco Containers
+{% endblock %}
+
+{% block main_left %}
+  {{utils.left_bar(nav.app_sub_nav)}}
+{% endblock %}
+
+{% block main_right %}
+
+  <div class="alert alert-success" role="alert">
+    <p>{{app.name}}@{{app.version}} on {{host.ip}}</p>
+  </div>
+
+  <div class="alert alert-success" role="alert">
+    <p>这里是容器性能图表</p>
+    <p>好吧他现在是空的</p>
+  </div>
+
+  <div class="text-right">
+    <form method="post" action="{{url_for('container.container', cid=container.container_id)}}">
+      <input type="hidden" name="cid" value="{{container.container_id}}"/>
+      <button type="submit" class="btn btn-warning">下线这个容器</button>
+    </form>
+  </div>
+{% endblock %}
+
+{# vim:set ft=jinja: #}

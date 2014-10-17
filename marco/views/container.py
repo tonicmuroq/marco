@@ -1,7 +1,8 @@
 # coding: utf-8
 
 import os
-from flask import Blueprint, jsonify, current_app, request
+from flask import (Blueprint, jsonify, current_app,
+        request, render_template, redirect, url_for)
 
 from marco.ext import etcd
 from marco.models import Container
@@ -31,7 +32,17 @@ def containers(app, host):
 @bp.route('/<cid>', methods=['GET', 'POST'])
 def container(cid):
     c = Container.get_by_container_id(cid)
-    return str(c)
+    app = c and c.application or None
+    host = c and c.host or None
+    if not (c and app and host):
+        abort(404)
+    if request.method == 'GET':
+        return render_template('/container/container.html',
+                container=c, app=app, host=host)
+    elif request.method == 'POST':
+        remove_container(c)
+        return redirect(url_for('app.app_info',
+            name=app.name, version=app.version))
 
 
 @bp.route('/remove', methods=['POST'])
