@@ -62,7 +62,7 @@ def app_add_container(name, version):
 
 @bp.route('/<name>/<version>/build', methods=['POST'])
 def app_build_image(name, version):
-    base = request.form.get('base', 'http://docker-registry.intra.hunantv.com/nbeimage/ubuntu:python-2014.9.30')
+    base = request.form['base']
     host_id = request.form['host_id']
     host = Host.get(host_id)
     if not host:

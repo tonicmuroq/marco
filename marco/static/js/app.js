@@ -16,9 +16,10 @@ $('.btn-add-container').click(function() {
 
 $('.btn-build-image').click(function() {
   var self = $(this),
-      url = self.data('url'),
-      host = '5';
-  $.post(url, {host_id: host}).fail(function (e){
+    url = self.data('url'),
+    base = $('#build-base').val(),
+    host = '5';
+  $.post(url, {host_id: host, base: base}).fail(function (e){
     alert('出错了');
   }).done(function(r) {
     if (!r.r) {
