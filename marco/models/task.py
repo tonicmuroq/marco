@@ -35,7 +35,7 @@ class StoredTask(Base):
             q = q.filter(cls.status == status.value)
         if succ is not None:
             q = q.filter(cls.succ == succ.value)
-        q = q.offset(start)
+        q = q.order_by(cls.id.desc()).offset(start)
         if limit is not None:
             q = q.limit(limit)
         return q.all()

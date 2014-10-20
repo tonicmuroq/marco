@@ -31,9 +31,10 @@ def app_set_info(name):
 def app_info(name, version):
     app = Application.get_by_name_and_version(name, version)
     ptasks = app.processing_tasks(limit=5)
+    tasks = app.tasks()
     if not app:
         abort(404)
-    return render_template('/app/app.html', app=app, ptasks=ptasks)
+    return render_template('/app/app.html', app=app, ptasks=ptasks, tasks=tasks)
 
 
 @bp.route('/<name>/<version>/tasks')
