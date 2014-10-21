@@ -2,7 +2,9 @@
 
 from flask import Blueprint, abort, render_template
 
+from marco.ext import es
 from marco.models.task import StoredTask
+
 
 bp = Blueprint('task', __name__, url_prefix='/task')
 
@@ -12,4 +14,8 @@ def task(task_id):
     st = StoredTask.get(task_id)
     if not st:
         abort(404)
-    return render_template('/task/task.html', st=st)
+    app = st.application
+    query = 'apptype:test AND name:%s' % app.name    
+    r = es.search(q=query)
+    logs = ['{@timestamp}: {data}'.format(**d['_source']) for d in r['hits']['hits']]
+    return render_template('/task/task.html', st=st, logs=logs)

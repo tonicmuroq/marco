@@ -3,5 +3,6 @@ PyYAML
 Flask-SQLAlchemy
 MySQL-python
 enum34
+elasticsearch
 -e git+http://git.hunantv.com/mirror/python-etcd.git#egg=etcd
 -e git+http://git.hunantv.com/tonic/flask-navigator.git#egg=flask_navigator

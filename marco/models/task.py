@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from werkzeug import cached_property
+
 from marco.ext import db
 
 from marco.models.consts import TaskType, TaskStatus, TaskResult
@@ -61,3 +63,8 @@ class StoredTask(Base):
 
     def kind_cn(self):
         return repr_dict[TaskType(self.kind)]
+
+    @cached_property
+    def application(self):
+        from .application import Application
+        return Application.get(self.app_id)

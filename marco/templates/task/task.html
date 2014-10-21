@@ -26,6 +26,12 @@
     <li class="list-group-item"><span class="task-label">任务结果:</span><span>{{st.result}}</span></li>
   </div>
 
+  <div class="alert alert-info" role="alert">
+    {% for line in logs %}
+      <p>{{line}}</p>
+    {% endfor %}
+  </div>
+
 {% endblock %}
 
 {% block more_css %}
