@@ -1,13 +1,23 @@
 # coding: utf-8
 
-from flask import Blueprint, request, render_template, abort, jsonify
+from flask import Blueprint, request, render_template, abort
 
 from marco.actions import add_container, build_image, test_app, remove_app
 from marco.models.application import Application
 from marco.models.host import Host
 
+from marco.views.utils import jsonify
+
 
 bp = Blueprint('app', __name__, url_prefix='/app')
+
+
+class AppNotReadyError(Exception):
+    message = 'App not ready yet'
+
+
+class AppNotFoundError(Exception):
+    message = 'App not found'
 
 
 @bp.route('/')
@@ -47,6 +57,7 @@ def app_tasks(name, version):
 
 
 @bp.route('/<name>/<version>/add', methods=['POST'])
+@jsonify
 def app_add_container(name, version):
     host_id = request.form['host_id']
     host = Host.get(host_id)
@@ -54,15 +65,12 @@ def app_add_container(name, version):
         return jsonify({"r": 1, "msg": "no such host"})
 
     app = Application.get_by_name_and_version(name, version)
-    if not app:
-        return jsonify({"r": 1, "msg": "no such app"})
-    if app.processing():
-        return jsonify({"r": 1, "msg": "正在执行其他任务"})
-    r = add_container(app, host)
-    return jsonify(r)
+    validate_app(app)
+    return add_container(app, host)
 
 
 @bp.route('/<name>/<version>/build', methods=['POST'])
+@jsonify
 def app_build_image(name, version):
     base = request.form['base']
     host_id = request.form['host_id']
@@ -71,15 +79,12 @@ def app_build_image(name, version):
         return jsonify({"r": 1, "msg": "no such host"})
 
     app = Application.get_by_name_and_version(name, version)
-    if not app:
-        return jsonify({"r": 1, "msg": "no such app"})
-    if app.processing():
-        return jsonify({"r": 1, "msg": "正在执行其他任务"})
-    r = build_image(app, host, base)
-    return jsonify(r)
+    validate_app(app)
+    return build_image(app, host, base)
 
 
 @bp.route('/<name>/<version>/test', methods=['POST'])
+@jsonify
 def app_test_app(name, version):
     host_id = request.form['host_id']
     host = Host.get(host_id)
@@ -87,15 +92,12 @@ def app_test_app(name, version):
         return jsonify({"r": 1, "msg": "no such host"})
 
     app = Application.get_by_name_and_version(name, version)
-    if not app:
-        return jsonify({"r": 1, "msg": "no such app"})
-    if app.processing():
-        return jsonify({"r": 1, "msg": "正在执行其他任务"})
-    r = test_app(app, host)
-    return jsonify(r)
+    validate_app(app)
+    return test_app(app, host)
 
 
 @bp.route('/<name>/<version>/remove', methods=['POST'])
+@jsonify
 def app_remove_app(name, version):
     host_id = request.form['host_id']
     host = Host.get(host_id)
@@ -103,11 +105,21 @@ def app_remove_app(name, version):
         return jsonify({"r": 1, "msg": "no such host"})
 
     app = Application.get_by_name_and_version(name, version)
-    if not app:
-        return jsonify({"r": 1, "msg": "no such app"})
     if app.name == 'marco':
         return jsonify({"r": 1, "msg": "marco 不能下光!"})
+    validate_app(app)
+    return remove_app(app, host)
+
+
+def validate_app(app):
+    if not app:
+        raise AppNotFoundError()
     if app.processing():
-        return jsonify({"r": 1, "msg": "正在执行其他任务"})
-    r = remove_app(app, host)
-    return jsonify(r)
+        raise AppNotReadyError()
+
+
+@bp.errorhandler(AppNotReadyError)
+@bp.errorhandler(AppNotFoundError)
+@jsonify
+def error_handler(error):
+    return {"r": 1, "msg": error.message}

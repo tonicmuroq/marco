@@ -1,0 +1,35 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block title %}
+  Marco Applications
+{% endblock %}
+
+{% block main_left %}
+  {{utils.left_bar(nav.app_sub_nav)}}
+{% endblock %}
+
+{% block main_right %}
+
+  {% if st.success() %}
+    <div class="alert alert-success" role="alert">成功</div>
+  {% else %}
+    <div class="alert alert-warning" role="alert">失败</div>
+  {% endif %}
+
+  <div class="list-group">
+    <div class="list-group-item list-group-item-info">任务信息</div>
+    <li class="list-group-item"><span class="task-label">创建时间:</span><span>{{st.create_time()}}</span></li>
+    <li class="list-group-item"><span class="task-label">任务类型:</span><span>{{st.kind_cn()}}</span></li>
+    <li class="list-group-item"><span class="task-label">任务状态:</span><span>{{'运行...' if st.processing() else '完成'}}</span></li>
+    <li class="list-group-item"><span class="task-label">完成时间:</span><span>{{st.finish_time()}}</span></li>
+    <li class="list-group-item"><span class="task-label">任务结果:</span><span>{{st.result}}</span></li>
+  </div>
+
+{% endblock %}
+
+{% block more_css %}
+  .task-label { margin-right: 10px; font-weight: bold; }
+{% endblock %}
+
+{# vim:set ft=jinja: #}

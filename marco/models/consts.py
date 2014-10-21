@@ -18,5 +18,5 @@ class TaskStatus(Enum):
 
 
 class TaskResult(Enum):
-    Succ = 0
-    Fail = 1
+    Succ = 1
+    Fail = 0

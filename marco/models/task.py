@@ -2,7 +2,7 @@
 
 from marco.ext import db
 
-from marco.models.consts import TaskType, TaskStatus
+from marco.models.consts import TaskType, TaskStatus, TaskResult
 from marco.models.base import Base
 
 
@@ -29,6 +29,10 @@ class StoredTask(Base):
     finished = db.Column(db.DateTime)
 
     @classmethod
+    def get(cls, id):
+        return db.session.query(cls).filter(cls.id == id).one()
+
+    @classmethod
     def get_multi(cls, app_id, status=None, succ=None, start=0, limit=20):
         q = db.session.query(cls).filter(cls.app_id == app_id)        
         if status is not None:
@@ -40,9 +44,20 @@ class StoredTask(Base):
             q = q.limit(limit)
         return q.all()
 
+    def success(self):
+        return TaskResult(self.succ) == TaskResult.Succ
+
     def processing(self):
         return self.status == TaskStatus.Running.value
 
     def repr(self):
-        time_str = self.created.strftime('%Y-%m-%d %H:%M:%S')
-        return '%s: %s' % (time_str, repr_dict[TaskType(self.kind)])
+        return '%s: %s' % (self.create_time(), self.kind_cn())
+
+    def create_time(self):
+        return self.created.strftime('%Y-%m-%d %H:%M:%S')
+
+    def finish_time(self):
+        return self.finished and self.finished.strftime('%Y-%m-%d %H:%M:%S') or ''
+
+    def kind_cn(self):
+        return repr_dict[TaskType(self.kind)]

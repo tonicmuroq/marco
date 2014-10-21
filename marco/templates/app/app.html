@@ -15,14 +15,16 @@
     <div class="list-group">
       <div class="list-group-item list-group-item-info">活动列表</div>
       {% for task in tasks %}
-        <div class="list-group-item">
+        <a class="list-group-item" href="{{url_for('task.task', task_id=task.id)}}" target="_blank">
           <span class="label label-info">{{task.repr()}}</span>
-          {% if not task.succ %}
+          {% if task.success() %}
             <span class="label label-success">成功</span>
+          {% elif task.processing() %}
+            <span class="label label-warning">正在执行...</span>
           {% else %}
             <span class="label label-warning">失败</span>
           {% endif %}
-        </div>
+        </a>
       {% endfor %}
     </div>
   {% endif %}
