@@ -11,6 +11,10 @@
 
 {% block main_right %}
 
+  <div class="app-block">
+    <svg id="chart" data-url="{{url_for('app.app_metric', name=app.name, version=app.version)}}"/>
+  </div>
+
   {% if tasks %}
     <div class="list-group">
       <div class="list-group-item list-group-item-info">活动列表</div>
@@ -68,12 +72,19 @@
 {% endblock %}
 
 {% block more_css %}
-  .app-block { padding-top: 20px; }
+  .app-block { padding-top: 20px; padding-bottom: 20px; }
   .container-check { position: absolute; border-right: 1px solid #ddd; padding: 0 12px; left: 0; }
 {% endblock %}
 
 {% block bottom_script %}
   <script type="text/javascript" src="/marco/static/js/app.js"></script>
+  <script type="text/javascript" src="/marco/static/js/charts.js"></script>
+{% endblock %}
+
+{% block more_header %}
+  <script type="text/javascript" src="/marco/static/js/d3.min.js"></script>
+  <script type="text/javascript" src="/marco/static/js/nv.d3.min.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href="/marco/static/css/nv.d3.min.css">
 {% endblock %}
 
 {# vim:set ft=jinja: #}

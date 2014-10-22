@@ -6,7 +6,7 @@ import yaml
 from flask import Flask
 from werkzeug.utils import import_string
 
-from marco.ext import db, etcd, es
+from marco.ext import db, etcd, es, influxdb
 from marco.views.navigator import init_nav
 
 
@@ -40,6 +40,7 @@ def create_app():
     db.init_app(app)
     etcd.init_app(app)
     es.init_app(app)
+    influxdb.init_app(app)
     init_nav(app)
 
     for bp in blueprints:

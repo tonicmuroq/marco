@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from datetime import datetime
 from flask import Blueprint, request, render_template, abort
 
 from marco.actions import add_container, build_image, test_app, remove_app
@@ -45,6 +46,20 @@ def app_info(name, version):
     if not app:
         abort(404)
     return render_template('/app/app.html', app=app, ptasks=ptasks, tasks=tasks)
+
+
+@bp.route('/<name>/<version>/metrics')
+@jsonify
+def app_metric(name, version):
+
+    def _time_format(timestamp):
+        t = datetime.fromtimestamp(timestamp)
+        return t.strftime('%Y-%m-%d %H:%M:%S')
+
+    app = Application.get_by_name_and_version(name, version)
+    data = app.realtime_metric_data()
+    points = [{'series': 0, 'x': p[0], 'y': p[1]} for p in data['points']]
+    return {"data": [{'key': data['name'], 'values': points}, ]}
 
 
 @bp.route('/<name>/<version>/tasks')
