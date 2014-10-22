@@ -14,7 +14,7 @@ class Container(Base):
     port = db.Column(db.Integer, default=0)
     host_id = db.Column(db.Integer, default=0)
     app_id = db.Column(db.Integer, default=0)
-    daemon_id = db.Column(db.String(255), nullable=False)
+    ident_id = db.Column(db.String(255), nullable=False)
 
     @classmethod
     def get_by_container_id(cls, cid):

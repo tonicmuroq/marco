@@ -55,31 +55,6 @@
   </div>
 {% endmacro %}
 
-{% macro containers_block(containers) %}
-  <div class="container">
-    {% for container in containers %}
-      <div class="col-xs-6 col-md-4">
-        <a href="{{ url_for('container.container', cid=container.container_id) }}" class="thumbnail btn btn-success">
-          <div class="caption">
-            <dl class="dl-horizontal">
-              <dt>容器ID</dt>
-              <dd>{{ container.container_id[:7] }}</dd>
-              <dt>对内端口</dt>
-              <dd>{{ container.port }}</dd>
-              <dt>应用名称</dt>
-              <dd>{{ container.application.name }}</dd>
-              <dt>应用版本</dt>
-              <dd>{{ container.application.version }}</dd>
-              <dt>DaemonID</dt>
-              <dd>{{ container.daemon_id or '-' }}</dd>
-            </dl>
-          </div>
-        </a>
-      </div>
-    {% endfor %}
-  </div>
-{% endmacro %}
-
 {% macro containers_list(containers, show_check=True) %}
   <div class="list-group container-list">
     <li class="list-group-item list-group-item-info">容器列表</li>
