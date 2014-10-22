@@ -15,7 +15,7 @@ def task(task_id):
     if not st:
         abort(404)
     app = st.application
-    query = 'apptype:test AND name:%s' % app.name    
+    query = 'apptype:test AND name:%s AND appid:%s' % (app.name, st.test_id)
     r = es.search(q=query)
     logs = ['{@timestamp}: {data}'.format(**d['_source']) for d in r['hits']['hits']]
     return render_template('/task/task.html', st=st, logs=logs)

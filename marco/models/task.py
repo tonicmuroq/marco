@@ -68,3 +68,9 @@ class StoredTask(Base):
     def application(self):
         from .application import Application
         return Application.get(self.app_id)
+
+    @cached_property
+    def test_id(self):
+        if TaskType(self.kind) != TaskType.TestApplication:
+            return ''
+        return self.result.split('|', 1)[0]
