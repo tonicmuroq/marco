@@ -14,8 +14,9 @@
 
   <div class="app-block">
     {{charts.chart(app, 'cpu_usage', 'CPU使用率', '.3%')}}
-    {{charts.chart(app, 'mem_usage', 'Mem使用率', 'e')}}
-    {{charts.chart(app, 'net_recv', '网络')}}
+    {{charts.chart(app, 'mem_usage', 'Mem', 'e')}}
+    {{charts.chart(app, 'net_recv', 'net_recv')}}
+    {{charts.chart(app, 'net_send', 'net_send')}}
   </div>
 
   {% if tasks %}
