@@ -51,7 +51,8 @@ def app_info(name, version):
 @jsonify
 def app_metric(name, version):
     app = Application.get_by_name_and_version(name, version)
-    data = app.realtime_metric_data()
+    metric_name = request.args.get('metric_name', 'cpu_usage')
+    data = app.realtime_metric_data(metric_name)
     points = [{'series': 0, 'x': p[0], 'y': p[1]} for p in data['points']]
     return {"data": [{'key': data['name'], 'values': points}, ]}
 

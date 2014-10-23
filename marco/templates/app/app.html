@@ -1,5 +1,6 @@
 {% extends "/base.html" %}
 {% import "/utils.html" as utils %}
+{% import "/charts.html" as charts %}
 
 {% block title %}
   Marco Applications
@@ -12,7 +13,9 @@
 {% block main_right %}
 
   <div class="app-block">
-    <svg id="chart" data-url="{{url_for('app.app_metric', name=app.name, version=app.version)}}"/>
+    {{charts.chart(app, 'cpu_usage', 'CPU使用率', '.3%')}}
+    {{charts.chart(app, 'mem_usage', 'Mem使用率', 'e')}}
+    {{charts.chart(app, 'net_recv', '网络')}}
   </div>
 
   {% if tasks %}

@@ -105,6 +105,9 @@ class Application(Base):
         return 'http://{self.name}.intra.hunantv.com'.format(self=self)
 
     def realtime_metric_data(self, metric='cpu_usage', time='10s', limit=100):
-        sql = ("select sum(value) from %s where "
-               "metric='%s' group by time(%s) limit %s" % (self.name, metric, time, limit))
-        return influxdb.query(sql)[0]
+        try:
+            sql = ("select sum(value) from %s where "
+                   "metric='%s' group by time(%s) limit %s" % (self.name, metric, time, limit))
+            return influxdb.query(sql)[0]
+        except:
+            return {'data': [], 'name': ''}
