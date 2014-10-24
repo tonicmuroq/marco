@@ -7,6 +7,9 @@ SQLALCHEMY_POOL_RECYCLE: 3600
 DOT_URL: "http://10.1.201.99:45000"
 ES_URI: "http://10.1.201.140:9200"
 INFLUXDB_URI: "http://root:root@10.1.201.110:8086/NBE"
+GITLAB_URL: "http://git.hunantv.com"
+GITLAB_TOKEN: "pmtQ2kZaYQSarGwU3DYy"
+# 这货应该从openid取
 
 mysql:
     host: "localhost"

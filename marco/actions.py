@@ -6,6 +6,7 @@ from flask import current_app
 
 
 API_FORMATS = {
+    'register_app': '/app/{projectname}/{version}',
     'add_container': '/app/{app.name}/{app.version}/add',
     'build_image': '/app/{app.name}/{app.version}/build',
     'test_app': '/app/{app.name}/{app.version}/test',
@@ -57,4 +58,14 @@ def remove_container(container):
     target_url = current_app.config['DOT_URL']
     url = urljoin(target_url, API_FORMATS['remove_container'].format(container=container))
     r = requests.post(url)
+    return r.json()
+
+
+def register_app(projectname, version, group, appyaml, configyaml):
+    target_url = current_app.config['DOT_URL']
+    url = urljoin(target_url, API_FORMATS['register_app'].format(
+        projectname=projectname, version=version))
+
+    data = {'group': group, 'appyaml': appyaml, 'configyaml': configyaml}
+    r = requests.post(url, data)
     return r.json()
