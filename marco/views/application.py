@@ -133,7 +133,7 @@ def sync_database(name, version):
     y = yaml_loads(app.app_yaml)
     schema = y.get('schema', '')
     if schema:
-        sql = git.getrawblob(app.project_id, schema)
+        sql = git.getrawblob(app.gitlab_id, schema)
         sync_database(app, sql)
     return {'r': 0}
 

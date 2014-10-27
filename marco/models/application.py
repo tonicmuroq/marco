@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from urllib2 import quote
 from werkzeug import cached_property
 
 from marco.ext import db, etcd, influxdb
@@ -19,7 +20,6 @@ class Application(Base):
     group = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime)
-    project_id = db.Column(db.Integer, nullable=False)
 
     @classmethod
     def get_by_name_and_version(cls, name, version):
@@ -84,6 +84,10 @@ class Application(Base):
         from .host import Host
         host_ids = list(set(c.host_id for c in self.containers))
         return filter(None, [Host.get(i) for i in host_ids])
+
+    @property
+    def gitlab_id(self):
+        return quote('%s/%s' % (self.group, self.name), safe='')
 
     def is_daemon(self):
         y = yaml_loads(self.app_yaml)

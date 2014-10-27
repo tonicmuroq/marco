@@ -37,7 +37,6 @@ def gitlab_merge():
     configyaml = git.getrawblob(project_id, version, 'config.yaml') or ''
 
     register_app(projectname, version, group,
-            yaml_to_json(appyaml), yaml_to_json(configyaml),
-            project_id)
+            yaml_to_json(appyaml), yaml_to_json(configyaml))
 
     return {'r': 0}
