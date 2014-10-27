@@ -9,7 +9,7 @@ ES_URI: "http://10.1.201.140:9200"
 INFLUXDB_URI: "http://root:root@10.1.201.110:8086/NBE"
 GITLAB_URL: "http://git.hunantv.com"
 GITLAB_TOKEN: "pmtQ2kZaYQSarGwU3DYy"
-DB_MANAGER_URL: "192.168.2.213:8088"
+DB_MANAGER_URL: "192.168.8.213:8088"
 
 mysql:
     host: "localhost"
