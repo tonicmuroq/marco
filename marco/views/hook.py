@@ -29,7 +29,7 @@ def gitlab_merge():
     project = git.getproject(project_id)
     repos = git.getrepositories(project_id)
 
-    group = project['path']
+    group = project['namespace']['name']
     projectname = project['name']
     version = repos[0]['commit']['id'][:7]
 
