@@ -63,12 +63,12 @@ def remove_container(container):
     return r.json()
 
 
-def register_app(projectname, version, group, appyaml, configyaml, project_id):
+def register_app(projectname, version, group, appyaml, configyaml):
     target_url = current_app.config['DOT_URL']
     url = urljoin(target_url, API_FORMATS['register_app'].format(
         projectname=projectname, version=version))
 
-    data = {'group': group, 'appyaml': appyaml, 'configyaml': configyaml, 'pid': project_id}
+    data = {'group': group, 'appyaml': appyaml, 'configyaml': configyaml}
     r = requests.post(url, data)
     return r.json()
 
