@@ -1,8 +1,10 @@
 # coding: utf-8
 
 import requests
+from urllib import urlencode
 from urlparse import urljoin
 from flask import current_app
+from werkzeug import urls
 
 
 API_FORMATS = {
@@ -61,11 +63,28 @@ def remove_container(container):
     return r.json()
 
 
-def register_app(projectname, version, group, appyaml, configyaml):
+def register_app(projectname, version, group, appyaml, configyaml, project_id):
     target_url = current_app.config['DOT_URL']
     url = urljoin(target_url, API_FORMATS['register_app'].format(
         projectname=projectname, version=version))
 
-    data = {'group': group, 'appyaml': appyaml, 'configyaml': configyaml}
+    data = {'group': group, 'appyaml': appyaml, 'configyaml': configyaml, 'pid': project_id}
     r = requests.post(url, data)
+    return r.json()
+
+
+def sync_database(app, sql):
+    target_url = current_app.config['DB_MANAGER_URL']
+    data = {
+        'DbUid': app.name,
+        'businessCode': 'AutoUpdate',
+        'DbName': app.name,
+        'SysUid': 'CreateDbUser',
+        'SysPwd': 'CreateDbUser',
+        'sqlscript': sql,
+    }
+    query = urlencode(data)
+    url = urls.URL(scheme='http', netloc=target_url,
+            path='/InitDataBase.aspx', query=query, fragment='')
+    r = requests.post(url.to_url())
     return r.json()

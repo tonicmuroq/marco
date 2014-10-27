@@ -10,6 +10,7 @@ INFLUXDB_URI: "http://root:root@10.1.201.110:8086/NBE"
 GITLAB_URL: "http://git.hunantv.com"
 GITLAB_TOKEN: "pmtQ2kZaYQSarGwU3DYy"
 # 这货应该从openid取
+DB_MANAGER_URL: "192.168.2.213:8088"
 
 mysql:
     host: "localhost"

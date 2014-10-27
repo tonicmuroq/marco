@@ -1,11 +1,12 @@
 # coding: utf-8
-
-from flask import Blueprint, request, render_template, abort
+import gitlab
+from flask import Blueprint, request, render_template, abort, current_app
 
 from marco.actions import add_container, build_image, test_app, remove_app
 from marco.models.application import Application
 from marco.models.host import Host
 
+from marco.utils import yaml_loads
 from marco.views.utils import jsonify
 
 
@@ -119,6 +120,22 @@ def app_remove_app(name, version):
         return jsonify({"r": 1, "msg": "marco 不能下光!"})
     validate_app(app)
     return remove_app(app, host)
+
+
+@bp.route('/<name>/<version>/syncdb', methods=['POST', ])
+@jsonify
+def sync_database(name, version):
+    app = Application.get_by_name_and_version(name, version)
+    if not app:
+        raise AppNotFoundError()
+    git = gitlab.Gitlab(current_app.config['GITLAB_URL'],
+            token=current_app.config['GITLAB_TOKEN'])
+    y = yaml_loads(app.app_yaml)
+    schema = y.get('schema', '')
+    if schema:
+        sql = git.getrawblob(app.project_id, schema)
+        sync_database(app, sql)
+    return {'r': 0}
 
 
 def validate_app(app):

@@ -19,6 +19,7 @@ class Application(Base):
     group = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
     created = db.Column(db.DateTime)
+    project_id = db.Column(db.Integer, nullable=False)
 
     @classmethod
     def get_by_name_and_version(cls, name, version):
