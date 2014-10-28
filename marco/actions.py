@@ -1,10 +1,8 @@
 # coding: utf-8
 
 import requests
-from urllib import urlencode
 from urlparse import urljoin
 from flask import current_app
-from werkzeug import urls
 
 
 API_FORMATS = {
@@ -81,10 +79,7 @@ def sync_database(app, sql):
         'DbName': app.name,
         'SysUid': 'CreateDbUser',
         'SysPwd': 'CreateDbUser',
-        'sqlscript': sql,
+        'SqlScript': sql,
     }
-    query = urlencode(data)
-    url = urls.URL(scheme='http', netloc=target_url,
-            path='/InitDataBase.aspx', query=query, fragment='')
-    r = requests.post(url.to_url())
+    r = requests.post(urljoin(target_url, 'InitDataBase.aspx'), data)
     return r.json()
