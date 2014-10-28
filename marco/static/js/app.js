@@ -127,3 +127,9 @@ $('.btn-remove-containers').click(function() {
     alert("没有选择容器!");
   }
 });
+
+$('.btn-sync-db').click(function() {
+  var self = $(this),
+      url = self.data('url');
+  $.post(url);
+});

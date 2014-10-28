@@ -26,9 +26,9 @@ function metricChart(name, xLabel, yLabel, format, timeout) {
   $.get(url, function(d) {
     drawLineChart(d.data, name, xLabel, yLabel, format);
   });
-  setInterval(function() {
-    $.get(url, function(d) {
-      drawLineChart(d.data, name, xLabel, yLabel, format);
-    });
-  }, timeout);
+  //setInterval(function() {
+  //  $.get(url, function(d) {
+  //    drawLineChart(d.data, name, xLabel, yLabel, format);
+  //  });
+  //}, timeout);
 }

@@ -2,7 +2,7 @@
 import gitlab
 from flask import Blueprint, request, render_template, abort, current_app
 
-from marco.actions import add_container, build_image, test_app, remove_app
+from marco.actions import add_container, build_image, test_app, remove_app, sync_database as syncdb
 from marco.models.application import Application
 from marco.models.host import Host
 
@@ -133,8 +133,8 @@ def sync_database(name, version):
     y = yaml_loads(app.app_yaml)
     schema = y.get('schema', '')
     if schema:
-        sql = git.getrawblob(app.gitlab_id, schema)
-        sync_database(app, sql)
+        sql = git.getrawblob(app.gitlab_id, app.version, schema)
+        return syncdb(app, sql)
     return {'r': 0}
 
 
