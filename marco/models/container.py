@@ -2,7 +2,7 @@
 
 from werkzeug import cached_property
 
-from marco.ext import db, etcd
+from marco.ext import db
 from .base import Base
 
 
@@ -15,6 +15,7 @@ class Container(Base):
     host_id = db.Column(db.Integer, default=0)
     app_id = db.Column(db.Integer, default=0)
     ident_id = db.Column(db.String(255), nullable=False)
+    app_name = db.Column(db.String(255), nullable=False)
 
     @classmethod
     def get_by_container_id(cls, cid):
