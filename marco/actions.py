@@ -11,6 +11,7 @@ API_FORMATS = {
     'build_image': '/app/{app.name}/{app.version}/build',
     'test_app': '/app/{app.name}/{app.version}/test',
     'remove_app': '/app/{app.name}/{app.version}/remove',
+    'update_app': '/app/{name}/{from_version}/update',
     'remove_container': '/container/{container.container_id}/remove',
 }
 
@@ -82,4 +83,13 @@ def sync_database(app, sql):
         'SqlScript': sql,
     }
     r = requests.post(urljoin(target_url, 'InitDataBase.aspx'), data)
+    return r.json()
+
+
+def update_app_to_version(name, from_version, to_version, hosts):
+    target_url = current_app.config['DOT_URL']
+    url = urljoin(target_url, API_FORMATS['update_app'].format(name=name,
+            from_version=from_version))
+    data = {'to': to_version, 'hosts': hosts}
+    r = requests.post(url, data)
     return r.json()

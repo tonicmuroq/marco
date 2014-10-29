@@ -30,6 +30,10 @@ class Container(Base):
             q = q.filter(cls.app_id == app_id)
         return q.order_by(cls.app_id.asc()).all()
 
+    @classmethod
+    def get_multi_by_app_name(cls, app_name):
+        return db.session.query(cls).filter(cls.app_name == app_name).all()
+
     @cached_property
     def application(self):
         from .application import Application

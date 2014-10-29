@@ -2,8 +2,10 @@
 import gitlab
 from flask import Blueprint, request, render_template, abort, current_app
 
-from marco.actions import add_container, build_image, test_app, remove_app, sync_database as syncdb
+from marco.actions import (add_container, build_image, test_app,
+        remove_app, sync_database as syncdb, update_app_to_version)
 from marco.models.application import Application
+from marco.models.container import Container
 from marco.models.host import Host
 
 from marco.utils import yaml_loads
@@ -38,11 +40,27 @@ def app_set_info(name):
             latest=latest, online_apps=online_apps)
 
 
+@bp.route('/<name>/update', methods=['POST', ])
+@jsonify
+def update_app(name):
+    to_version = request.form['to_version']
+    cs = Container.get_multi_by_app_name(name)
+    update_args = {}
+    for c in cs:
+        update_args.setdefault(c.application.version, []).append(c.host.ip)
+    for version, hosts in update_args.iteritems():
+        if version == to_version:
+            continue
+        hosts = list(set(hosts))
+        update_app_to_version(name, version, to_version, hosts)
+    return {'r': 0}
+
+
 @bp.route('/<name>/<version>/')
 def app_info(name, version):
     app = Application.get_by_name_and_version(name, version)
     ptasks = app.processing_tasks(limit=5)
-    tasks = app.tasks()
+    tasks = app.tasks(limit=10)
     if not app:
         abort(404)
     return render_template('/app/app.html', app=app, ptasks=ptasks, tasks=tasks)
