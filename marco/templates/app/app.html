@@ -12,16 +12,18 @@
 
 {% block main_right %}
 
+  {#
   <div class="app-block">
     {{charts.chart(app, 'cpu_usage', 'CPU使用率', '.3%')}}
     {{charts.chart(app, 'mem_usage', 'Mem', 'e')}}
     {{charts.chart(app, 'net_recv', 'net_recv')}}
     {{charts.chart(app, 'net_send', 'net_send')}}
   </div>
+  #}
 
   {% if tasks %}
     <div class="list-group">
-      <div class="list-group-item list-group-item-info">活动列表</div>
+      <div class="list-group-item list-group-item-info">最近的活动列表</div>
       {% for task in tasks %}
         <a class="list-group-item" href="{{url_for('task.task', task_id=task.id)}}" target="_blank">
           <span class="label label-info">{{task.repr()}}</span>
@@ -43,6 +45,11 @@
       {% for ptask in ptasks %}
         <p>{{ptask.repr()}}</p>
       {% endfor %}
+    </div>
+  {% elif app.image_addr %}
+    <div class="alert alert-success" role="alert">
+      <p>镜像已经构建好, 可以部署了</p>
+      <p>镜像地址: {{app.image_addr}}</p>
     </div>
   {% else %}
     <div class="alert alert-success" role="alert">没有正在执行的任务</div>
@@ -68,6 +75,7 @@
 
   <div class="text-left app-block">
     <button type="button" class="btn btn-info btn-sync-db" data-url="{{url_for('app.sync_database', name=app.name, version=app.version)}}">syncdb</button>
+    <button type="button" class="btn btn-info btn-update-app" data-url="{{url_for('app.update_app', name=app.name)}}" data-version="{{app.version}}">全部更新到这个版本</button>
   </div>
 
   <div class="app-block">

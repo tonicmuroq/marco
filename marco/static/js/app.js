@@ -133,3 +133,12 @@ $('.btn-sync-db').click(function() {
       url = self.data('url');
   $.post(url);
 });
+
+$('.btn-update-app').click(function() {
+  var self = $(this),
+      url = self.data('url'),
+      version = self.data('version');
+  $.post(url, {to_version: version}, function(d) {
+    alert('更新成功, 坐等.');
+  });
+});
