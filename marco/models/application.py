@@ -96,7 +96,7 @@ class Application(Base):
 
     def tasks(self, status=None, succ=None, start=0, limit=20):
         from .task import StoredTask
-        return StoredTask.get_multi(self.id, status, succ)
+        return StoredTask.get_multi(self.id, status, succ, start=start, limit=limit)
 
     def processing_tasks(self, start=0, limit=20):
         return self.tasks(status=TaskStatus.Running, start=start, limit=limit)
