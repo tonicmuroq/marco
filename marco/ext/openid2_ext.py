@@ -12,7 +12,6 @@ from openid.extensions import sreg
 from openid.consumer.consumer import Consumer, SUCCESS
 from openid.store.filestore import FileOpenIDStore
 
-store = None
 sreg.data_fields = {
     'username': 'test',
     'email': 'test@xxx.com',
@@ -24,14 +23,6 @@ sreg.data_fields = {
 def sign(user_cookie_name, user):
     s = user_cookie_name + user
     return hmac.new('123', s).hexdigest()
-
-
-def get_store():
-    global store
-    if store is None:
-        permdir = os.getenv('NBE_PERMDIR', tempfile.mkdtemp())
-        store = FileOpenIDStore(permdir)
-    return store
 
 
 class OpenIDRouteNotFoundError(Exception):
@@ -46,12 +37,13 @@ class OpenID2User(dict):
 
 class OpenID2Client(object):
 
-    def __init__(self, verify_url):
+    def __init__(self, verify_url, store):
         self.verify_url = verify_url
+        self.store = store
 
     def login(self, req):
         continue_url = req.values.get('continue') or req.headers.get('Referer', '/')
-        consumer = Consumer({}, get_store())
+        consumer = Consumer({}, self.store)
         authreq = consumer.begin(current_app.config['OPENID2_YADIS'])
     
         sregreq = sreg.SRegRequest(optional=['username', 'uid'],
@@ -64,7 +56,7 @@ class OpenID2Client(object):
         return redirect(location=url)
     
     def verify(self, req):
-        consumer = Consumer({}, get_store())
+        consumer = Consumer({}, self.store)
         return_to = req.values.get('continue', '/')
         authres = consumer.complete(req.args, urljoin(req.host_url, self.verify_url))
         res = redirect(location=return_to)
@@ -92,6 +84,7 @@ class OpenID2Client(object):
 class OpenID2(object):
 
     def __init__(self, name='openid2',
+            file_store_path='',
             app=None,
             login_url='/_nbe/login/',
             verify_url='/_nbe/login/verify/',
@@ -101,7 +94,11 @@ class OpenID2(object):
             openid2_user_cookie_name='USER_COOKIE_NAME',
             openid2_sig_cookie_name='SIG_COOKIE_NAME',
             openid2_profile_cookie_name='PROFILE_COOKIE_NAME'):
+
         self.name = name
+        if not file_store_path:
+            file_store_path = os.path.join(tempfile.gettempdir(), 'nbe-openid2')
+        self.file_store_path = file_store_path
         self.app = app
 
         self.login_url = login_url
@@ -113,6 +110,8 @@ class OpenID2(object):
         self.openid2_user_cookie_name = openid2_user_cookie_name
         self.openid2_sig_cookie_name = openid2_sig_cookie_name
         self.openid2_profile_cookie_name = openid2_profile_cookie_name
+
+        self.store = FileOpenIDStore(self.file_store_path)
 
         if app is not None:
             self.init_app(app)
@@ -147,7 +146,7 @@ class OpenID2(object):
             return self.openid2.logout(request)
 
     def init_openid2(self):
-        return OpenID2Client(self.verify_url)
+        return OpenID2Client(self.verify_url, self.store)
 
     @property
     def openid2(self):
