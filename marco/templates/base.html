@@ -38,16 +38,18 @@
               </li>
             {% endfor %}
           </ul>
-          {#
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ g.user.name}} <b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{g.user.username or '未登录'}} <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="{{ g.logout_url }}">Logout</a></li>
+                {% if g.user %}
+                  <li><a href="{{openid2.logout_url}}">Logout</a></li>
+                {% else %}
+                  <li><a href="{{openid2.login_url}}">Login</a></li>
+                {% endif %}
               </ul>
             </li>
           </ul>
-          #}
         </nav>
       </div>
     </header>
