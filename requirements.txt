@@ -7,4 +7,5 @@ elasticsearch
 influxdb
 pyapi-gitlab
 python-etcd
+python-openid
 -e git+http://git.hunantv.com/tonic/flask-navigator.git#egg=flask_navigator
