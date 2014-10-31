@@ -156,7 +156,7 @@ class OpenID2(object):
         ctx = _app_ctx_stack.top
         if ctx is not None:
             if not hasattr(ctx, 'openid2'):
-                ctx.openid2= self.init_openid2()
+                ctx.openid2 = self.init_openid2()
             return ctx.openid2
 
     def __getattr__(self, name):
