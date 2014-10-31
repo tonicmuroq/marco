@@ -1,7 +1,8 @@
 # coding: utf-8
 
-from flask import Blueprint, render_template, abort, request
+from flask import Blueprint, render_template, abort, g, redirect
 
+from marco.ext import openid2
 from marco.models.host import Host
 from marco.models.container import Container
 
@@ -22,3 +23,9 @@ def host_info(host_id):
         abort(404)
     cs = Container.get_multi(host.id)
     return render_template('/host/host.html', containers=cs, host=host)
+
+
+@bp.before_request
+def test_if_logged_in():
+    if not g.user:
+        return redirect(openid2.login_url)

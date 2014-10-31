@@ -1,8 +1,8 @@
 # coding: utf-8
 
-from flask import Blueprint, abort, render_template
+from flask import Blueprint, abort, render_template, g, redirect
 
-from marco.ext import es
+from marco.ext import es, openid2
 from marco.models.task import StoredTask
 
 
@@ -22,3 +22,9 @@ def task(task_id):
     except:
         logs = []
     return render_template('/task/task.html', st=st, logs=logs)
+
+
+@bp.before_request
+def test_if_logged_in():
+    if not g.user:
+        return redirect(openid2.login_url)

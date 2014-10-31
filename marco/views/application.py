@@ -1,7 +1,9 @@
 # coding: utf-8
 import gitlab
-from flask import Blueprint, request, render_template, abort, current_app
+from flask import (Blueprint, request, render_template,
+        abort, current_app, g, redirect)
 
+from marco.ext import openid2
 from marco.actions import (add_container, build_image, test_app,
         remove_app, sync_database as syncdb, update_app_to_version)
 from marco.models.application import Application
@@ -168,3 +170,9 @@ def validate_app(app):
 @jsonify
 def error_handler(error):
     return {"r": 1, "msg": error.message}
+
+
+@bp.before_request
+def test_if_logged_in():
+    if not g.user:
+        return redirect(openid2.login_url)

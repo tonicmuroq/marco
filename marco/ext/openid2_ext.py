@@ -7,7 +7,7 @@ import tempfile
 from urllib import urlencode
 from urlparse import urljoin
 
-from flask import g, request, redirect, current_app, url_for, _app_ctx_stack
+from flask import g, request, redirect, current_app, _app_ctx_stack
 from openid.extensions import sreg
 from openid.consumer.consumer import Consumer, SUCCESS
 from openid.store.filestore import FileOpenIDStore
@@ -133,8 +133,6 @@ class OpenID2(object):
         @app.before_request
         def get_login_info():
             g.user = OpenID2User(json.loads(request.cookies.get(self.openid2_profile_cookie_name, '{}')))
-        #    if not g.user_dict:
-        #        return redirect(url_for('openid2_login'))
 
         @app.route(self.login_url)
         def openid2_login():

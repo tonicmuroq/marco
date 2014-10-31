@@ -1,10 +1,10 @@
 # coding: utf-8
 
 import os
-from flask import (Blueprint, jsonify, current_app,
-        request, render_template, redirect, url_for)
+from flask import (Blueprint, jsonify, current_app, abort,
+        request, render_template, redirect, url_for, g)
 
-from marco.ext import etcd
+from marco.ext import etcd, openid2
 from marco.models import Container
 from marco.utils import yaml_loads
 from marco.actions import remove_container
@@ -54,3 +54,9 @@ def remove_containers():
     for c in filter(None, cs):
         remove_container(c)
     return jsonify({"r": 0, "msg": "ok"})
+
+
+@bp.before_request
+def test_if_logged_in():
+    if not g.user:
+        return redirect(openid2.login_url)

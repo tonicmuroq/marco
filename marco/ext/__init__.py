@@ -12,5 +12,8 @@ es = ElasticSearch()
 influxdb = InfluxDB()
 openid2 = OpenID2()
 
-__all__ = ['db', 'etcd', 'es', 'influxdb', 'openid2',
-        'SQLAlchemy', 'Etcd', 'ElasticSearch', 'InfluxDB', 'OpenID2']
+__all__ = [
+    'db', 'etcd', 'es', 'influxdb', 'openid2',
+    'SQLAlchemy', 'Etcd', 'ElasticSearch',
+    'InfluxDB', 'OpenID2',
+]
