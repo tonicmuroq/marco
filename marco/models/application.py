@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import yaml
 from urllib2 import quote
 from werkzeug import cached_property
 
@@ -47,10 +48,12 @@ class Application(Base):
     def get(cls, id):
         return db.session.query(cls).filter(cls.id == id).first()
 
+    def get_yaml_key(self, kind):
+        return '/NBE/{self.name}/{self.version}/{kind}'.format(self=self, kind=kind)
+
     def get_yaml(self, kind):
-        key = '/NBE/{self.name}/{self.version}/{kind}'.format(self=self, kind=kind)
-        r = etcd.get(key)
-        return r.value if (r and not r.dir) else ''
+        r = etcd.get(self.get_yaml_key(kind))
+        return r.value if (r and not r.dir) else '{}'
 
     @cached_property
     def app_yaml(self):
@@ -117,3 +120,14 @@ class Application(Base):
             return influxdb.query(sql)[0]
         except:
             return {'data': [], 'name': ''}
+
+    def add_store_instance(self, kind, connection_args):
+        if not kind in ('mysql', 'redis'):
+            return
+        config = yaml_loads(self.config_yaml)
+        if kind in config:
+            return
+        config[kind] = connection_args
+        key = self.get_yaml_key(kind)
+        value = yaml.safe_dump(config, default_flow_style=False)
+        etcd.write(key, value)

@@ -13,6 +13,7 @@ API_FORMATS = {
     'remove_app': '/app/{app.name}/{app.version}/remove',
     'update_app': '/app/{name}/{from_version}/update',
     'remove_container': '/container/{container.container_id}/remove',
+    'add_mysql': '/resource/{app.name}/{app.version}/mysql',
 }
 
 
@@ -92,4 +93,11 @@ def update_app_to_version(name, from_version, to_version, hosts):
             from_version=from_version))
     data = {'to': to_version, 'hosts': hosts}
     r = requests.post(url, data)
+    return r.json()
+
+
+def add_mysql(app):
+    target_url = current_app.config['DOT_URL']
+    url = urljoin(target_url, API_FORMATS['add_mysql'].format(app=app))
+    r = requests.post(url)
     return r.json()

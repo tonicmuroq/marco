@@ -1,0 +1,74 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+{% import "/charts.html" as charts %}
+
+{% block title %}
+  Marco Applications
+{% endblock %}
+
+{% block main_left %}
+  <div class="list-group">
+      <a class="list-group-item" href="{{url_for('app.app_info', name=app.name, version=app.version)}}">总览</a>
+      <a class="list-group-item" href="{{url_for('app.app_resource', name=app.name, version=app.version)}}">存储</a>
+  </div>
+{% endblock %}
+
+{% block main_right %}
+  {{resource(mysqls, 'MySQL')}}
+  {{resource(redises, 'Redis')}}
+{% endblock %}
+
+{% macro resource(rs, name) %}
+  <div class="app-block">
+    <div class="panel panel-info">
+      <div class="panel-heading">{{name}}</div>
+      <div class="panel-body">
+        {% if mysqls %}
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Host</th>
+                <th>Port</th>
+                <th>DB</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for key, r in rs.iteritems() %}
+                <tr>
+                  <td>{{key}}</td>
+                  <td>{{r['host']}}</td>
+                  <td>{{r['port']}}</td>
+                  <td>{{r['db']}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          你还没有{{name}}实例
+        {% endif %}
+      </div>
+    </div>
+    <div class="text-left">
+        <button type="button" class="btn btn-info btn-add-{{name.lower()}}" data-url="{{url_for('app.app_add_resource', name=app.name, version=app.version, res=name.lower())}}">新增一个{{name}}实例</button>
+    </div>
+  </div>
+{% endmacro %}
+
+{% block more_css %}
+  .app-block { padding-top: 20px; padding-bottom: 20px; }
+  .container-check { position: absolute; border-right: 1px solid #ddd; padding: 0 12px; left: 0; }
+{% endblock %}
+
+{% block bottom_script %}
+  <script type="text/javascript" src="/marco/static/js/app.js"></script>
+  <script type="text/javascript" src="/marco/static/js/charts.js"></script>
+{% endblock %}
+
+{% block more_header %}
+  <script type="text/javascript" src="/marco/static/js/d3.min.js"></script>
+  <script type="text/javascript" src="/marco/static/js/nv.d3.min.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href="/marco/static/css/nv.d3.min.css">
+{% endblock %}
+
+{# vim:set ft=jinja: #}

@@ -5,7 +5,7 @@ from flask import (Blueprint, request, render_template,
 
 from marco.ext import openid2
 from marco.actions import (add_container, build_image, test_app,
-        remove_app, sync_database as syncdb, update_app_to_version)
+        remove_app, sync_database as syncdb, update_app_to_version, add_mysql)
 from marco.models.application import Application
 from marco.models.container import Container
 from marco.models.host import Host
@@ -25,6 +25,13 @@ class AppNotFoundError(Exception):
     message = 'App not found'
 
 
+def _view_get_app(name, version):
+    app = Application.get_by_name_and_version(name, version)
+    if not app:
+        abort(404)
+    return app
+
+
 @bp.route('/')
 def index():
     app_names = Application.get_all_app_names(limit=20)
@@ -40,6 +47,29 @@ def app_set_info(name):
     online_apps = [a for a in apps if a.n_container]
     return render_template('/app/app_set.html', apps=apps,
             latest=latest, online_apps=online_apps)
+
+
+@bp.route('/<name>/<version>/resources')
+def app_resource(name, version):
+    app = _view_get_app(name, version)
+    config = yaml_loads(app.config_yaml)
+    mysqls = {k: v for k, v in config.iteritems() if k.startswith('mysql')}
+    redises = {k: v for k, v in config.iteritems() if k.startswith('redis')}
+    return render_template('/app/app_resource.html',
+            app=app, config=config, mysqls=mysqls, redises=redises)
+
+
+@bp.route('/<name>/<version>/<res>/add', methods=['POST', ])
+@jsonify
+def app_add_resource(name, version, res):
+    app = _view_get_app(name, version)
+    _res_dict = {
+        'mysql': add_mysql,
+    }
+    r = _res_dict.get(res, lambda app:{'r': 1})(app)
+    if not r['r'] and r[res]:
+        app.add_store_instance(res, r[res])
+    return r
 
 
 @bp.route('/<name>/update', methods=['POST', ])
@@ -60,11 +90,9 @@ def update_app(name):
 
 @bp.route('/<name>/<version>/')
 def app_info(name, version):
-    app = Application.get_by_name_and_version(name, version)
+    app = _view_get_app(name, version)
     ptasks = app.processing_tasks(limit=5)
     tasks = app.tasks(limit=10)
-    if not app:
-        abort(404)
     return render_template('/app/app.html', app=app, ptasks=ptasks, tasks=tasks)
 
 

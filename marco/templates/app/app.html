@@ -7,7 +7,11 @@
 {% endblock %}
 
 {% block main_left %}
-  {{utils.left_bar(nav.app_sub_nav)}}
+  <div class="list-group">
+      <a class="list-group-item" href="{{url_for('app.app_set_info', name=app.name)}}">所有版本</a>
+      <a class="list-group-item" href="{{url_for('app.app_resource', name=app.name, version=app.version)}}">存储</a>
+  </div>
+  {#{{utils.left_bar(nav.app_sub_nav)}}#}
 {% endblock %}
 
 {% block main_right %}
