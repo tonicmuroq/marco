@@ -45,17 +45,6 @@ def container(cid):
             name=app.name, version=app.version))
 
 
-@bp.route('/remove', methods=['POST'])
-def remove_containers():
-    cids = request.form.getlist('cids[]')
-    if not cids:
-        return jsonify({"r": 1, "msg": "no containers"})
-    cs = [Container.get_by_container_id(cid) for cid in cids]
-    for c in filter(None, cs):
-        remove_container(c)
-    return jsonify({"r": 0, "msg": "ok"})
-
-
 @bp.before_request
 def test_if_logged_in():
     if not g.user:

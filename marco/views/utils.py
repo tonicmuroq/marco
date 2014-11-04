@@ -10,7 +10,7 @@ def jsonify(f):
     @wraps(f)
     def _(*args, **kwargs):
         r = f(*args, **kwargs)
-        return Response(json.dumps(r), mimetype='application/json')
+        return r and Response(json.dumps(r), mimetype='application/json')
     return _
 
 

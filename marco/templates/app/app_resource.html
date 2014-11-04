@@ -50,7 +50,7 @@
       </div>
     </div>
     <div class="text-left">
-        <button type="button" class="btn btn-info btn-add-{{name.lower()}}" data-url="{{url_for('app.app_add_resource', name=app.name, version=app.version, res=name.lower())}}">新增一个{{name}}实例</button>
+        <button type="button" class="btn btn-info btn-add-{{name.lower()}}" data-url="{{url_for('ajax.app_add_resource', app_id=app.id, res=name.lower())}}">新增一个{{name}}实例</button>
     </div>
   </div>
 {% endmacro %}

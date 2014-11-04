@@ -11,6 +11,7 @@ from marco.views.navigator import init_nav
 
 
 blueprints = (
+    'ajax',
     'index',
     'host',
     'hook',

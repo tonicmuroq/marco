@@ -37,6 +37,7 @@ def build_image(app, host, base):
     url = urljoin(target_url, API_FORMATS['build_image'].format(app=app))
     data = {'host': host.ip, 'base': base, 'group': app.group}
     r = requests.post(url, data)
+    print r.json()
     return r.json()
 
 
