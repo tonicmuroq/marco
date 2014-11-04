@@ -3,7 +3,7 @@
 import os
 import yaml
 
-from flask import Flask, request, g, current_app
+from flask import Flask
 from werkzeug.utils import import_string
 
 from marco.ext import db, etcd, es, influxdb, openid2
@@ -31,13 +31,13 @@ def load_config():
 
 def create_app():
     config = load_config()
-    binds = {
-        'marco': 'mysql://{username}:{password}@{host}:{port}/{db}'.format(**config['mysql'])
-    }
+    #binds = {
+    #    'marco': 'mysql://{username}:{password}@{host}:{port}/{db}'.format(**config['mysql'])
+    #}
 
     app = Flask(__name__, static_url_path='/marco/static')
     app.config.update(config)
-    app.config.update(SQLALCHEMY_BINDS=binds)
+    #app.config.update(SQLALCHEMY_BINDS=binds)
 
     db.init_app(app)
     etcd.init_app(app)
