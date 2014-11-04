@@ -27,11 +27,10 @@ def gitlab_merge():
             token=current_app.config['GITLAB_TOKEN'])
     project_id = attrs['target_project_id']
     project = git.getproject(project_id)
-    repos = git.getrepositories(project_id)
 
     group = project['namespace']['name']
     projectname = project['name']
-    version = repos[0]['commit']['id'][:7]
+    version = git.listrepositorycommits(project_id)[0]['id'][:7]
 
     appyaml = git.getrawblob(project_id, version, 'app.yaml') or ''
     configyaml = git.getrawblob(project_id, version, 'config.yaml') or ''
