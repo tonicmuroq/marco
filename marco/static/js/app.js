@@ -142,3 +142,9 @@ $('.btn-update-app').click(function() {
     alert('更新成功, 坐等.');
   });
 });
+
+$('.btn-add-mysql').click(function() {
+  var self = $(this),
+      url = self.data('url');
+  $.post(url);
+});
