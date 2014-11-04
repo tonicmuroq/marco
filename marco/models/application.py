@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import yaml
+import json
 from urllib2 import quote
 from werkzeug import cached_property
 
@@ -54,6 +55,12 @@ class Application(Base):
     def get_yaml(self, kind):
         r = etcd.get(self.get_yaml_key(kind))
         return r.value if (r and not r.dir) else '{}'
+
+    def mysql_args_dict(self):
+        key = '/NBE/{self.name}/mysql'.format(self=self)
+        r = etcd.get(key)
+        r = r.value if (r and not r.dir) else '{}'
+        return json.loads(r)
 
     @cached_property
     def app_yaml(self):
@@ -128,6 +135,6 @@ class Application(Base):
         if kind in config:
             return
         config[kind] = connection_args
-        key = self.get_yaml_key(kind)
+        key = self.get_yaml_key('config.yaml')
         value = yaml.safe_dump(config, default_flow_style=False)
         etcd.write(key, value)
