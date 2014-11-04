@@ -13,11 +13,3 @@ DB_MANAGER_URL: "http://192.168.8.213:8088"
 
 OPENID2_YADIS: "http://openids.intra.hunantv.com/server/yadis/"
 OPENID2_LOGOUT: "http://openids.intra.hunantv.com/auth/logout/"
-
-mysql:
-    host: "localhost"
-    port: 3306
-    username: "root"
-    password: ""
-    db: "marco"
-
