@@ -123,7 +123,8 @@ class Application(Base):
     def realtime_metric_data(self, metric='cpu_usage', time='10s', limit=100):
         try:
             sql = ("select sum(value) from %s where "
-                   "metric='%s' group by time(%s) limit %s" % (self.name, metric, time, limit))
+                   "metric=%s group by time(%s) limit %s",
+                   (self.name, metric, time, limit))
             return influxdb.query(sql)[0]
         except:
             return {'data': [], 'name': ''}
