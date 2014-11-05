@@ -54,7 +54,7 @@ class OpenID2Client(object):
         urlencode({'continue': continue_url})
         url = authreq.redirectURL(return_to=verify_url, realm=req.host_url)
         return redirect(location=url)
-    
+
     def verify(self, req):
         consumer = Consumer({}, self.store)
         return_to = req.values.get('continue', '/')
@@ -70,7 +70,7 @@ class OpenID2Client(object):
             profile = sregres and {s[0]: s[1] for s in sregres.items()} or {}
             res.set_cookie(current_app.config['OPENID2_PROFILE_COOKIE_NAME'], json.dumps(profile), max_age=one_year)
         return res
-    
+
     def logout(self, req):
         continue_url = req.values.get('continue') or req.headers.get('Referer', '/')
         this_url = urljoin(req.host_url, continue_url)

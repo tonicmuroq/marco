@@ -26,12 +26,12 @@ class Application(Base):
 
     @classmethod
     def get_by_name_and_version(cls, name, version):
-        '''获取确定的一个app, 如果有多个就挂'''
+        u"""获取确定的一个app, 如果有多个就挂"""
         return db.session.query(cls).filter(cls.name == name, cls.version == version).one()
 
     @classmethod
     def get_all_app_names(cls, start=0, limit=20):
-        '''取所有的应用名字, 从start开始取limit个'''
+        u"""取所有的应用名字, 从start开始取limit个"""
         q = db.session.query(cls.name).distinct(cls.name).order_by(cls.name.asc()).offset(start)
         if limit is not None:
             q = q.limit(limit)
@@ -39,7 +39,7 @@ class Application(Base):
 
     @classmethod
     def get_multi(cls, name, start=0, limit=20):
-        '''按照名字取应用列表, 从start开始取limit个'''
+        u"""按照名字取应用列表, 从start开始取limit个"""
         q = db.session.query(cls).filter(cls.name == name).order_by(cls.id.desc()).offset(start)
         if limit is not None:
             q = q.limit(limit)
@@ -80,18 +80,18 @@ class Application(Base):
 
     @cached_property
     def containers(self):
-        '''应用的所有container'''
+        u"""应用的所有container"""
         from .container import Container
         return Container.get_multi(app_id=self.id)
 
     @cached_property
     def n_container(self):
-        '''container数量'''
+        u"""container数量"""
         return len(self.containers)
 
     @cached_property
     def hosts(self):
-        '''这个应用所处的host'''
+        u"""这个应用所处的host"""
         from .host import Host
         host_ids = list(set(c.host_id for c in self.containers))
         return filter(None, [Host.get(i) for i in host_ids])
