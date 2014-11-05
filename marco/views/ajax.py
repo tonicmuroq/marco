@@ -3,9 +3,9 @@
 import gitlab
 from flask import Blueprint, request, current_app, g
 
-from marco.actions import (add_container, build_image, test_app,
-    remove_app, sync_database, update_app_to_version, add_mysql,
-    remove_container)
+from marco.actions import (add_container, build_image, test_app, remove_app,
+                           sync_database, update_app_to_version, add_mysql,
+                           remove_container)
 from marco.models.host import Host
 from marco.models.container import Container
 from marco.models.application import Application
@@ -45,7 +45,7 @@ def app_add_resource(app_id, res):
     if connection_args:
         app.add_store_instance(res, connection_args)
     else:
-        r = _res_dict.get(res, lambda app:{'r': 1})(app)
+        r = _res_dict.get(res, lambda app: {'r': 1})(app)
         if not r['r'] and r[res]:
             app.add_store_instance(res, r[res])
     return {'r': 0, 'msg': 'ok'}
@@ -73,7 +73,8 @@ def app_metric(app_id):
     app = _get_app(app_id)
     metric_name = request.args.get('metric_name', 'cpu_usage')
     data = app.realtime_metric_data(metric_name)
-    points = [{'series': 0, 'x': p[0], 'y': p[1]} for p in data.get('points', [])]
+    points = [{'series': 0, 'x': p[0], 'y': p[1]}
+              for p in data.get('points', [])]
     return {'data': [{'key': data['name'], 'values': points}, ]}
 
 
@@ -131,7 +132,7 @@ def app_sync_db(app_id):
     app = _get_app(app_id)
 
     git = gitlab.Gitlab(current_app.config['GITLAB_URL'],
-            token=current_app.config['GITLAB_TOKEN'])
+                        token=current_app.config['GITLAB_TOKEN'])
     y = yaml_loads(app.app_yaml)
     schema = y.get('schema', '')
     if schema:

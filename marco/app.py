@@ -9,7 +9,6 @@ from werkzeug.utils import import_string
 from marco.ext import db, etcd, es, influxdb, openid2
 from marco.views.navigator import init_nav
 
-
 blueprints = (
     'ajax',
     'index',
@@ -22,11 +21,10 @@ blueprints = (
 
 
 def load_config():
-    config = {}
-    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'config.yaml')
     with open(config_path, 'r') as f:
-        config = yaml.load(f)
-    return config
+        return yaml.load(f)
 
 
 def create_app():
