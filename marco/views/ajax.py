@@ -67,6 +67,15 @@ def update_app(name):
     return {'r': 0}
 
 
+@bp.route('/app/<app_id>/all_metrics')
+@jsonify
+def app_all_metric(app_id):
+    app = _get_app(app_id)
+    data = app.all_realtime_metric_data(
+        int(request.args.get('time', 10)), int(request.args.get('limit', 100)))
+    return {k: v['points'] for k, v in data.iteritems()}
+
+
 @bp.route('/app/<app_id>/metrics')
 @jsonify
 def app_metric(app_id):
@@ -92,7 +101,6 @@ def app_add_container(app_id):
 @bp.route('/app/<app_id>/build', methods=['POST', ])
 @jsonify
 def app_build_image(app_id):
-    print '111'
     base = request.form['base']
     host = Host.get(request.form['host_id'])
     if not host:

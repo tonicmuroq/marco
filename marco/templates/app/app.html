@@ -1,6 +1,5 @@
 {% extends "/base.html" %}
 {% import "/utils.html" as utils %}
-{% import "/charts.html" as charts %}
 
 {% block title %}
   Marco Applications
@@ -15,15 +14,86 @@
 {% endblock %}
 
 {% block main_right %}
-
-  {#
   <div class="app-block">
-    {{charts.chart(app, 'cpu_usage', 'CPU使用率', '.3%')}}
-    {{charts.chart(app, 'mem_usage', 'Mem', 'e')}}
-    {{charts.chart(app, 'net_recv', 'net_recv')}}
-    {{charts.chart(app, 'net_send', 'net_send')}}
+      <div><p onclick='$(this).next().toggle()'>CPU 状况</p><svg id='usages_cpu'></svg></div>
+      <div><p onclick='$(this).next().toggle()'>内存状况</p><svg id='usages_mem'></svg></div>
+      <div><p onclick='$(this).next().toggle()'>网络状况</p><svg id='usages_net'></svg></div>
+      <script>
+        var gMetricsDatum = {
+            cpu_usage: [],
+            mem_usage: [],
+            net_recv: [],
+            net_send: []
+        };
+        -function updateChart(limit) {
+            $.ajax({
+                url: '/ajax/app/{{ app.id }}/all_metrics?version={{ app.version|e }}&limit=' + limit,
+                type: 'GET',
+                success: function(r) {
+                    var i, j;
+                    for (i in r) {
+                        gMetricsDatum[i].shift();
+                        r[i].reverse();
+                        for (j in r[i]) {
+                            gMetricsDatum[i].push({x: r[i][j][0], y: r[i][j][1]});
+                        }
+                    }
+                    nv.addGraph(function() {
+                      var chart = nv.models.lineChart().options({
+                          margin: {left: 100, bottom: 100},
+                          x: function(d, i) {return i},
+                          showXAxis: true,
+                          showYAxis: true,
+                          transitionDuration: 250
+                      });
+
+                      chart.xAxis
+                        .axisLabel("Time (s)")
+                        .tickFormat(function(x) {return d3.format(',')(x - 99)});
+
+                      chart.yAxis
+                        .axisLabel('Usage')
+                        .tickFormat(d3.format(',.2f'))
+                        ;
+
+                      d3.select('#usages_cpu')
+                        .datum([{
+                                   values: gMetricsDatum.cpu_usage.map(function(e) {return {y: e.y * 100};}),
+                                   key: 'CPU Usage (%)',
+                                   color: 'red'
+                               }])
+                        .call(chart);
+
+                      d3.select('#usages_mem')
+                        .datum([{
+                                   values: gMetricsDatum.mem_usage.map(function(e) {return {y: e.y / 1048576};}),
+                                   key: 'Mem Usage (MB)',
+                                   color: 'blue'
+                               }])
+                        .call(chart);
+
+                      d3.select('#usages_net')
+                        .datum([{
+                                   values: gMetricsDatum.net_recv.map(function(e) {return {y: e.y / 1024};}),
+                                   key: 'Net Send (KB)',
+                                   color: 'green'
+                               }, {
+                                   values: gMetricsDatum.net_send.map(function(e) {return {y: e.y / 1024};}),
+                                   key: 'Net Recv (KB)',
+                                   color: 'black'
+                               }])
+                        .call(chart);
+
+                      nv.utils.windowResize(chart.update);
+                      chart.dispatch.on('stateChange', function(e) {nv.log('New State:', JSON.stringify(e));});
+                      return chart;
+                    });
+                    setTimeout(function() {updateChart(1);}, 10000);
+                }
+            });
+        }(100);
+      </script>
   </div>
-  #}
 
   {% if tasks %}
     <div class="list-group">
@@ -102,9 +172,19 @@
 {% endblock %}
 
 {% block more_header %}
-  <script type="text/javascript" src="/marco/static/js/d3.min.js"></script>
-  <script type="text/javascript" src="/marco/static/js/nv.d3.min.js"></script>
-  <link rel="stylesheet" type="text/css" media="screen" href="/marco/static/css/nv.d3.min.css">
+    <link href="/marco/static/lib/css/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="/marco/static/lib/js/d3/d3.v3.js"></script>
+    <script src="/marco/static/lib/js/d3/nv.d3.js"></script>
+    <script src="/marco/static/lib/js/d3/tooltip.js"></script>
+    <script src="/marco/static/lib/js/d3/utils.js"></script>
+    <script src="/marco/static/lib/js/d3/interactiveLayer.js"></script>
+    <script src="/marco/static/lib/js/d3/legend.js"></script>
+    <script src="/marco/static/lib/js/d3/axis.js"></script>
+    <script src="/marco/static/lib/js/d3/scatter.js"></script>
+    <script src="/marco/static/lib/js/d3/line.js"></script>
+    <script src="/marco/static/lib/js/d3/lineChart.js"></script>
+    <style>
+      .app-block svg {min-height: 400px; min-width: 640px}
+      .app-block p {cursor: pointer}
+    </style>
 {% endblock %}
-
-{# vim:set ft=jinja: #}
