@@ -11,7 +11,9 @@ from marco.models.base import Base
 
 from marco.utils import yaml_loads
 
-METRICS = set(['cpu_usage', 'mem_usage', 'net_recv', 'net_send'])
+METRICS = set(['cpu_usage', 'cpu_user', 'cpu_system',
+               'mem_usage', 'mem_rss',
+               'net_recv', 'net_send', 'net_recv_err', 'net_send_err'])
 
 
 class Application(Base):
@@ -129,7 +131,7 @@ class Application(Base):
         try:
             if metric not in METRICS:
                 raise ValueError('Unexpected metric')
-            sql = ("select sum(value) from %s where "
+            sql = ("select mean(value) from %s where "
                    "metric='%s' group by time(%ds) limit %d" %
                    (self.name, metric, time, limit))
             return influxdb.query(sql)[0]
