@@ -163,7 +163,7 @@ def remove_containers():
             return False
 
     cids = request.form.getlist('cids[]')
-    cs = [Container.get_by_container_id(cid) for cid in cids]
+    cs = [Container.get_by_container_id(cid) for cid in cids if cid]
     for c in filter(_filter_container, cs):
         remove_container(c)
     return {'r': 0, 'msg': 'ok'}
