@@ -2,7 +2,7 @@
 
 from werkzeug import cached_property
 
-from marco.ext import db
+from marco.ext import db, es
 
 from marco.models.consts import TaskType, TaskStatus, TaskResult
 from marco.models.base import Base
@@ -15,6 +15,12 @@ repr_dict = {
     TaskType.BuildImage: u'构建镜像',
     TaskType.TestApplication: u'测试应用',
     TaskType.HostInfo: u'请求host信息',
+}
+
+
+apptype_dict = {
+    TaskType.TestApplication: 'test',
+    TaskType.BuildImage: 'build',
 }
 
 
@@ -63,6 +69,18 @@ class StoredTask(Base):
 
     def kind_cn(self):
         return repr_dict[TaskType(self.kind)]
+
+    def logs(self, size=100, timeout=1):
+        apptype = apptype_dict.get(TaskType(self.kind), '')
+        if not apptype:
+            return []
+        q = 'apptype:%s AND name:%s AND id:%s' % (apptype, self.application.name, self.id)
+        r = es.search(q=q, size=size, sort='count', timeout=timeout)
+        try:
+            logs = [d['_source']['data'] for d in r['hits']['hits']]
+        except:
+            logs = []
+        return logs
 
     @cached_property
     def application(self):

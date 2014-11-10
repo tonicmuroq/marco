@@ -35,8 +35,7 @@ def create_app():
     app.config.update(config)
 
     logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
-                        level=logging.INFO if os.getenv('NBE_RUNENV')
-                        else logging.DEBUG)
+                        level=logging.INFO)
 
     db.init_app(app)
     etcd.init_app(app)

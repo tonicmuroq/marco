@@ -28,10 +28,28 @@
     <li class="list-group-item"><span class="task-label">任务结果:</span><span>{{st.result}}</span></li>
   </div>
 
-  <div class="alert alert-info" role="alert">
+  <div class="alert alert-info" role="alert" id="task-log">
+  {% if st.processing() %}
+    <script>
+      var ws = new WebSocket('{{ws_url}}');
+      ws.onmessage = function(e) {
+          $('#task-log').append('<p>'+e.data+'</p>');
+      }
+      ws.onopen = function(e) {
+          $('#task-log').html('Connected');
+      }
+      ws.onerror = function(e) {
+          $('#task-log').removeClass('alert-info').addClass('alert-error');
+      }
+      ws.onclose = function(e) {
+          $('#task-log').append('<p>Closed</p>');
+      }
+    </script>
+  {% else %}
     {% for line in logs %}
       <p>{{line}}</p>
     {% endfor %}
+  {% endif %}
   </div>
 
 {% endblock %}
