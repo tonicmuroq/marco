@@ -73,7 +73,7 @@ def app_all_metric(app_id):
     app = _get_app(app_id)
     data = app.all_realtime_metric_data(
         int(request.args.get('time', 10)), int(request.args.get('limit', 100)))
-    return {k: v['points'] for k, v in data.iteritems()}
+    return {k: v.get('points', []) for k, v in data.iteritems()}
 
 
 @bp.route('/app/<app_id>/metrics')

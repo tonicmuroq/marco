@@ -2,6 +2,7 @@
 
 import yaml
 import json
+import logging
 from urllib2 import quote
 from werkzeug import cached_property
 
@@ -135,7 +136,8 @@ class Application(Base):
                    "metric='%s' group by time(%ds) limit %d" %
                    (self.name, metric, time, limit))
             return influxdb.query(sql)[0]
-        except:
+        except StandardError, e:
+            logging.exception(e)
             return {'data': [], 'name': ''}
 
     def add_store_instance(self, kind, connection_args):
