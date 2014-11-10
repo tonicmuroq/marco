@@ -2,6 +2,7 @@
 
 import os
 import yaml
+import logging
 
 from flask import Flask
 from werkzeug.utils import import_string
@@ -32,6 +33,10 @@ def create_app():
 
     app = Flask(__name__, static_url_path='/marco/static')
     app.config.update(config)
+
+    logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
+                        level=logging.INFO if os.getenv('NBE_RUNENV')
+                        else logging.DEBUG)
 
     db.init_app(app)
     etcd.init_app(app)
