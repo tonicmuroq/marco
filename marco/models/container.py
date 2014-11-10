@@ -19,6 +19,9 @@ class Container(Base):
 
     @classmethod
     def get_by_container_id(cls, cid):
+        # this is important...
+        if not cid:
+            return None
         return db.session.query(cls).filter(cls.container_id.like('%s%%' % cid)).first()
 
     @classmethod

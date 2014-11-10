@@ -73,7 +73,7 @@ def app_all_metric(app_id):
     app = _get_app(app_id)
     data = app.all_realtime_metric_data(
         int(request.args.get('time', 10)), int(request.args.get('limit', 100)))
-    return {k: v['points'] for k, v in data.iteritems()}
+    return {k: v.get('points', []) for k, v in data.iteritems()}
 
 
 @bp.route('/app/<app_id>/metrics')
@@ -163,7 +163,7 @@ def remove_containers():
             return False
 
     cids = request.form.getlist('cids[]')
-    cs = [Container.get_by_container_id(cid) for cid in cids]
+    cs = [Container.get_by_container_id(cid) for cid in cids if cid]
     for c in filter(_filter_container, cs):
         remove_container(c)
     return {'r': 0, 'msg': 'ok'}
