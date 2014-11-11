@@ -1,8 +1,8 @@
 # coding: utf-8
 
-from flask import Blueprint, abort, render_template, g, redirect
+from flask import Blueprint, abort, render_template, g, redirect, current_app
 
-from marco.ext import es, openid2
+from marco.ext import openid2
 from marco.models.task import StoredTask
 
 
@@ -14,14 +14,9 @@ def task(task_id):
     st = StoredTask.get(task_id)
     if not st:
         abort(404)
-    app = st.application
-    query = 'apptype:test AND name:%s AND appid:%s' % (app.name, st.test_id)
-    try:
-        r = es.search(q=query)
-        logs = ['{@timestamp}: {data}'.format(**d['_source']) for d in r['hits']['hits']]
-    except:
-        logs = []
-    return render_template('/task/task.html', st=st, logs=logs)
+    logs = st.logs(size=300)
+    ws_url = current_app.config['DOT_LOG_URL'] + '?task=%s' % task_id
+    return render_template('/task/task.html', st=st, logs=logs, ws_url=ws_url)
 
 
 @bp.before_request
