@@ -100,16 +100,16 @@
                         }
                     }
                     updateGraph('#usages_cpu', [
-                        {keyName: 'cpu_user', keyDisp: 'User', color: 'green'},
+                        {keyName: 'cpu_user', keyDisp: 'User', color: '#0c0'},
                         {keyName: 'cpu_system', keyDisp: 'System', color: 'navy'},
-                        {keyName: 'cpu_usage', keyDisp: 'Usage', color: 'black'}
+                        {keyName: 'cpu_usage', keyDisp: 'Usage', color: '#c80'}
                     ], function(y) {return y * 100;}, 'CPU (%)');
                     updateGraph('#usages_mem', [
-                        {keyName: 'mem_usage', keyDisp: 'Usage', color: 'green'},
+                        {keyName: 'mem_usage', keyDisp: 'Usage', color: '#c80'},
                         {keyName: 'mem_rss', keyDisp: 'RSS', color: 'navy'}
                     ], function(y) {return y / 1048576;}, 'Memory (MB)');
                     updateGraph('#usages_net', [
-                        {keyName: 'net_recv', keyDisp: 'Receive', color: 'green'},
+                        {keyName: 'net_recv', keyDisp: 'Receive', color: '#c80'},
                         {keyName: 'net_send', keyDisp: 'Send', color: 'blue'},
                         {keyName: 'net_recv_err', keyDisp: 'Receive Error', color: 'red'},
                         {keyName: 'net_send_err', keyDisp: 'Send Error', color: 'purple'},
