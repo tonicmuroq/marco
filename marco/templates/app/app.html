@@ -69,18 +69,12 @@
   </div>
 
   <div class="app-block" id='app-stat' style='display: none;'>
-      <div><p onclick='$(this).next().toggle()'>CPU 状况</p><svg id='usages_cpu'></svg></div>
-      <div><p onclick='$(this).next().toggle()'>内存状况</p><svg id='usages_mem'></svg></div>
-      <div><p onclick='$(this).next().toggle()'>网络状况</p><svg id='usages_net'></svg></div>
+      <div><p>CPU 状况</p><svg id='usages_cpu'></svg></div>
+      <div><p>内存状况</p><svg id='usages_mem'></svg></div>
+      <div><p>网络状况</p><svg id='usages_net'></svg></div>
       <script>
-        var gStatsStarted = false;
         function statsToggle(btn) {
-            $('#app-stat').slideToggle('fast');
-            if (gStatsStarted) {
-                return;
-            }
-            gStatsStarted = true;
-            $(btn).text('正在拉取数据');
+            $(btn).text('正在拉取数据')[0].onclick = function() {};
             var gMetricsDatum = {
                 cpu_usage: [],
                 cpu_user: [],
@@ -107,7 +101,7 @@
                 mem_usage: {},
                 mem_rss: {},
             };
-            -function updateCharts(limit) {
+            -function updateCharts(limit, initChart) {
                 function updateGraph(selector, graphKeys, yMapF, yLabel) {
                     nv.addGraph(function() {
                       var chart = nv.models.lineChart().options({
@@ -144,6 +138,9 @@
                     url: '/ajax/app/{{ app.id }}/all_metrics?version={{ app.version|e }}&limit=' + limit,
                     type: 'GET',
                     success: function(r) {
+                        if (initChart) {
+                            $('#app-stat').slideToggle('fast');
+                        }
                         var i, j, k, timestampGroup, timestamp;
                         for (i in r) {
                             r[i].reverse();
@@ -176,15 +173,14 @@
                             {keyName: 'net_recv_err', keyDisp: 'Receive Error', color: 'red'},
                             {keyName: 'net_send_err', keyDisp: 'Send Error', color: 'purple'},
                         ], function(y) {return y / 1048576;}, 'Net (KB)');
-                        setTimeout(function() {updateCharts(1);}, 10000);
+                        setTimeout(function() {updateCharts(1, false);}, 10000);
                         $(btn).text('状态检测');
                     },
                     error: function(r) {
-                        $(btn).text('拉取数据失败, 刷新页面以重试').click(function() {});
-                        $('#app-stat').hide();
+                        $(btn).text('拉取数据失败, 刷新页面以重试');
                     }
                 });
-            }(30);
+            }(30, true);
         }
       </script>
   </div>
@@ -227,6 +223,5 @@
     <script src="/marco/static/lib/js/d3/lineChart.js"></script>
     <style>
       .app-block svg {min-height: 400px; min-width: 640px}
-      .app-block p {cursor: pointer}
     </style>
 {% endblock %}
