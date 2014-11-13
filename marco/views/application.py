@@ -5,7 +5,8 @@ from flask import (Blueprint, request, render_template,
 
 from marco.ext import openid2
 from marco.actions import (add_container, build_image, test_app,
-        remove_app, sync_database as syncdb, update_app_to_version, add_mysql)
+        remove_app, sync_database as syncdb, update_app_to_version,
+        add_mysql, set_hook_branch, get_hook_branch)
 from marco.models.application import Application
 from marco.models.container import Container
 from marco.models.host import Host
@@ -49,6 +50,17 @@ def app_resource(name, version):
     redises = {k: v for k, v in config.iteritems() if k.startswith('redis')}
     return render_template('/app/app_resource.html',
             app=app, config=config, mysqls=mysqls, redises=redises)
+
+
+@bp.route('/<name>/settings/', methods=['POST', 'GET', ])
+def app_settings(name):
+    if request.method == 'POST':
+        branch = request.form.get('branch', type=str)
+        set_hook_branch(name, branch)
+
+    hook_branch = get_hook_branch(name)
+    return render_template('/app/app_settings.html',
+            name=name, hook_branch=hook_branch)
 
 
 @bp.route('/<name>/<version>/')
