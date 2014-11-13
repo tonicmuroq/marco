@@ -32,7 +32,7 @@ class Application(Base):
     @classmethod
     def get_by_name_and_version(cls, name, version):
         u"""获取确定的一个app, 如果有多个就挂"""
-        return db.session.query(cls).filter(cls.name == name, cls.version == version).one()
+        return db.session.query(cls).filter(cls.name == name, cls.version == version).first()
 
     @classmethod
     def get_all_app_names(cls, start=0, limit=20):

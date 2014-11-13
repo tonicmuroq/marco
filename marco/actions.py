@@ -14,6 +14,7 @@ API_FORMATS = {
     'update_app': '/app/{name}/{from_version}/update',
     'remove_container': '/container/{container.container_id}/remove',
     'add_mysql': '/resource/{app.name}/{app.version}/mysql',
+    'hook_branch': '/app/{app}/branch',
 }
 
 
@@ -102,3 +103,18 @@ def add_mysql(app):
     url = urljoin(target_url, API_FORMATS['add_mysql'].format(app=app))
     r = requests.post(url)
     return r.json()
+
+
+def set_hook_branch(app, branch):
+    target_url = current_app.config['DOT_URL']
+    url = urljoin(target_url, API_FORMATS['hook_branch'].format(app=app))
+    r = requests.put(url, {'branch': branch})
+    return r.json()
+
+
+def get_hook_branch(app):
+    target_url = current_app.config['DOT_URL']
+    url = urljoin(target_url, API_FORMATS['hook_branch'].format(app=app))
+    r = requests.get(url)
+    r = r.json()
+    return r['branch'] if not r['r'] else 'master'
