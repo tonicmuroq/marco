@@ -1,18 +1,11 @@
 # coding: utf-8
-import gitlab
 from flask import (Blueprint, request, render_template,
-        abort, current_app, g, redirect)
+        abort, g, redirect)
 
-from marco.ext import openid2
-from marco.actions import (add_container, build_image, test_app,
-        remove_app, sync_database as syncdb, update_app_to_version,
-        add_mysql, set_hook_branch, get_hook_branch)
+from marco.ext import openid2, dot
 from marco.models.application import Application
-from marco.models.container import Container
-from marco.models.host import Host
 
 from marco.utils import yaml_loads
-from marco.views.utils import jsonify
 
 
 bp = Blueprint('app', __name__, url_prefix='/app')
@@ -56,9 +49,9 @@ def app_resource(name, version):
 def app_settings(name):
     if request.method == 'POST':
         branch = request.form.get('branch', type=str)
-        set_hook_branch(name, branch)
+        dot.set_hook_branch(name, branch)
 
-    hook_branch = get_hook_branch(name)
+    hook_branch = dot.get_hook_branch(name)
     return render_template('/app/app_settings.html',
             name=name, hook_branch=hook_branch)
 

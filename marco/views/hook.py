@@ -4,7 +4,7 @@ import json
 import gitlab
 from flask import request, Blueprint, current_app
 
-from marco.actions import register_app, get_hook_branch
+from marco.ext import dot
 from marco.views.utils import jsonify
 from marco.utils import yaml_to_json, yaml_loads
 
@@ -31,13 +31,12 @@ def gitlab_merge():
     version = git.listrepositorycommits(project_id)[0]['id'][:7]
 
     appyaml = git.getrawblob(project_id, version, 'app.yaml') or ''
-    configyaml = git.getrawblob(project_id, version, 'config.yaml') or ''
 
     appyaml_dict = yaml_loads(appyaml)
-    if attrs['target_branch'] != get_hook_branch(appyaml_dict.get('appname')):
+    if attrs['target_branch'] != dot.get_hook_branch(appyaml_dict.get('appname')):
         return {'r': 1}
 
-    register_app(projectname.lower(), version, group.lower(),
-            yaml_to_json(appyaml), yaml_to_json(configyaml))
+    dot.register(projectname.lower(), version, group.lower(),
+            yaml_to_json(appyaml))
 
     return {'r': 0}

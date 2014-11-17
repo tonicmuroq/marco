@@ -3,9 +3,7 @@
 import gitlab
 from flask import Blueprint, request, current_app, g
 
-from marco.actions import (add_container, build_image, test_app, remove_app,
-                           sync_database, update_app_to_version, add_mysql,
-                           remove_container)
+from marco.ext import dot
 from marco.models.host import Host
 from marco.models.container import Container
 from marco.models.application import Application
@@ -38,14 +36,11 @@ def _get_app(id, validate_process=False):
 @jsonify
 def app_add_resource(app_id, res):
     app = _get_app(app_id)
-    _res_dict = {
-        'mysql': add_mysql,
-    }
     connection_args = app.mysql_args_dict()
     if connection_args:
         app.add_store_instance(res, connection_args)
     else:
-        r = _res_dict.get(res, lambda app: {'r': 1})(app)
+        r = dot.add_resource(app, res, res)
         if not r['r'] and r[res]:
             app.add_store_instance(res, r[res])
     return {'r': 0, 'msg': 'ok'}
@@ -63,7 +58,7 @@ def update_app(name):
         if version == to_version:
             continue
         hosts = list(set(hosts))
-        update_app_to_version(name, version, to_version, hosts)
+        dot.update_app(name, version, to_version, hosts)
     return {'r': 0}
 
 
@@ -95,7 +90,7 @@ def app_add_container(app_id):
         return {'r': 1, 'msg': 'no such host'}
 
     app = _get_app(app_id, validate_process=True)
-    return add_container(app, host)
+    return dot.add_container(app, host)
 
 
 @bp.route('/app/<app_id>/build', methods=['POST', ])
@@ -107,7 +102,7 @@ def app_build_image(app_id):
         return {'r': 1, 'msg': 'no such host'}
 
     app = _get_app(app_id, validate_process=True)
-    return build_image(app, host, base)
+    return dot.build_image(app, host, base)
 
 
 @bp.route('/app/<app_id>/test', methods=['POST', ])
@@ -118,7 +113,7 @@ def app_test_app(app_id):
         return {'r': 1, 'msg': 'no such host'}
 
     app = _get_app(app_id, validate_process=True)
-    return test_app(app, host)
+    return dot.test_app(app, host)
 
 
 @bp.route('/app/<app_id>/remove', methods=['POST', ])
@@ -131,7 +126,7 @@ def app_remove_app(app_id):
     app = _get_app(app_id, validate_process=True)
     if app.name in ('marco', 'openids'):
         return {'r': 1, 'msg': '不允许下线这些'}
-    return remove_app(app, host)
+    return dot.remove_app(app, host)
 
 
 @bp.route('/app/<app_id>/syncdb', methods=['POST', ])
@@ -145,7 +140,7 @@ def app_sync_db(app_id):
     schema = y.get('schema', '')
     if schema:
         sql = git.getrawblob(app.gitlab_id, app.version, schema)
-        return sync_database(app, sql)
+        return {'r': sql}
     return {'r': 0}
 
 
@@ -165,7 +160,7 @@ def remove_containers():
     cids = request.form.getlist('cids[]')
     cs = [Container.get_by_container_id(cid) for cid in cids if cid]
     for c in filter(_filter_container, cs):
-        remove_container(c)
+        dot.remove_container(c)
     return {'r': 0, 'msg': 'ok'}
 
 
