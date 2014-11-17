@@ -4,10 +4,9 @@ import os
 from flask import (Blueprint, jsonify, current_app, abort,
         request, render_template, redirect, url_for, g)
 
-from marco.ext import etcd, openid2
+from marco.ext import etcd, openid2, dot
 from marco.models import Container
 from marco.utils import yaml_loads
-from marco.actions import remove_container
 
 
 bp = Blueprint('container', __name__, url_prefix='/container')
@@ -40,7 +39,7 @@ def container(cid):
         return render_template('/container/container.html',
                 container=c, app=app, host=host)
     elif request.method == 'POST':
-        remove_container(c)
+        dot.remove_container(c)
         return redirect(url_for('app.app_info',
             name=app.name, version=app.version))
 

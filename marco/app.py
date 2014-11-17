@@ -7,7 +7,7 @@ import logging
 from flask import Flask
 from werkzeug.utils import import_string
 
-from marco.ext import db, etcd, es, influxdb, openid2
+from marco.ext import db, etcd, es, influxdb, openid2, dot
 from marco.views.navigator import init_nav
 
 blueprints = (
@@ -42,6 +42,7 @@ def create_app():
     es.init_app(app)
     influxdb.init_app(app)
     openid2.init_app(app)
+    dot.init_app(app)
     init_nav(app)
 
     for bp in blueprints:
