@@ -34,7 +34,6 @@ class DotClient(object):
         if resp.status_code != expected_code:
             raise DotClientError(resp.content, resp.status_code)
         if json:
-            print resp.json()
             return resp.json()
         return resp.content
 
