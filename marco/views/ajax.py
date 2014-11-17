@@ -1,9 +1,8 @@
 # coding: utf-8
 
-import gitlab
-from flask import Blueprint, request, current_app, g
+from flask import Blueprint, request, g
 
-from marco.ext import dot
+from marco.ext import dot, gitlab
 from marco.models.host import Host
 from marco.models.container import Container
 from marco.models.application import Application
@@ -134,12 +133,10 @@ def app_remove_app(app_id):
 def app_sync_db(app_id):
     app = _get_app(app_id)
 
-    git = gitlab.Gitlab(current_app.config['GITLAB_URL'],
-                        token=current_app.config['GITLAB_TOKEN'])
     y = yaml_loads(app.app_yaml)
     schema = y.get('schema', '')
     if schema:
-        sql = git.getrawblob(app.gitlab_id, app.version, schema)
+        sql = gitlab.getrawblob(app.gitlab_id, app.version, schema)
         return {'r': sql}
     return {'r': 0}
 

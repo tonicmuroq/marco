@@ -7,7 +7,7 @@ import logging
 from flask import Flask
 from werkzeug.utils import import_string
 
-from marco.ext import db, etcd, es, influxdb, openid2, dot
+from marco.ext import db, etcd, es, influxdb, openid2, dot, gitlab
 from marco.views.navigator import init_nav
 
 blueprints = (
@@ -18,6 +18,7 @@ blueprints = (
     'task',
     'container',
     'application',
+    'manage',
 )
 
 
@@ -33,6 +34,7 @@ def create_app():
 
     app = Flask(__name__, static_url_path='/marco/static')
     app.config.update(config)
+    app.secret_key = 'wolegeca'
 
     logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
                         level=logging.INFO)
@@ -43,6 +45,7 @@ def create_app():
     influxdb.init_app(app)
     openid2.init_app(app)
     dot.init_app(app)
+    gitlab.init_app(app)
     init_nav(app)
 
     for bp in blueprints:

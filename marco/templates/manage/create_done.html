@@ -1,0 +1,19 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block title %}
+  Marco Manage
+{% endblock %}
+
+{% block main_right %}
+  <div class="panel panel-info">
+    <div class="panel-heading">创建完成</div>
+    <div class="panel-body">
+      <div class="alter alter-info">
+        <p>现在就去fork <a href="{{project_url}}" target="_blank">{{name}}</a> 开发吧</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{# vim:set ft=jinja: #}
