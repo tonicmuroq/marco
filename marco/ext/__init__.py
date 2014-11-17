@@ -7,7 +7,7 @@ from .openid2_ext import OpenID2
 from .etcd_ext import Etcd
 from .elasticsearch_ext import ElasticSearch
 from .influxdb_ext import InfluxDB
-from .dot_ext import DotClient
+from .dot_ext import Dot
 
 
 db = SQLAlchemy()
@@ -15,7 +15,7 @@ etcd = Etcd()
 es = ElasticSearch()
 influxdb = InfluxDB()
 openid2 = OpenID2(file_store_path=os.getenv('NBE_PERMDIR', ''))
-dot = DotClient()
+dot = Dot()
 
 __all__ = [
     'db', 'etcd', 'es', 'influxdb', 'openid2', 'dot',
