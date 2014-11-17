@@ -1,10 +1,9 @@
 # coding: utf-8
 
 import json
-import gitlab
-from flask import request, Blueprint, current_app
+from flask import request, Blueprint
 
-from marco.ext import dot
+from marco.ext import dot, gitlab
 from marco.views.utils import jsonify
 from marco.utils import yaml_to_json, yaml_loads
 
@@ -21,16 +20,14 @@ def gitlab_merge():
     if not (hd['object_kind'] == 'merge_request' 
             and attrs['state'] == 'merged'):
         return {'r': 1}
-    git = gitlab.Gitlab(current_app.config['GITLAB_URL'],
-            token=current_app.config['GITLAB_TOKEN'])
     project_id = attrs['target_project_id']
-    project = git.getproject(project_id)
+    project = gitlab.getproject(project_id)
 
     group = project['namespace']['name']
     projectname = project['name']
-    version = git.listrepositorycommits(project_id)[0]['id'][:7]
+    version = gitlab.listrepositorycommits(project_id)[0]['id'][:7]
 
-    appyaml = git.getrawblob(project_id, version, 'app.yaml') or ''
+    appyaml = gitlab.getrawblob(project_id, version, 'app.yaml') or ''
 
     appyaml_dict = yaml_loads(appyaml)
     if attrs['target_branch'] != dot.get_hook_branch(appyaml_dict.get('appname')):
