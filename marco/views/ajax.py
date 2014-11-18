@@ -31,20 +31,6 @@ def _get_app(id, validate_process=False):
     return app
 
 
-@bp.route('/app/<app_id>/<res>/add', methods=['POST', ])
-@jsonify
-def app_add_resource(app_id, res):
-    app = _get_app(app_id)
-    connection_args = app.mysql_args_dict()
-    if connection_args:
-        app.add_store_instance(res, connection_args)
-    else:
-        r = dot.add_resource(app, res, res)
-        if not r['r'] and r[res]:
-            app.add_store_instance(res, r[res])
-    return {'r': 0, 'msg': 'ok'}
-
-
 @bp.route('/app/<name>/update', methods=['POST', ])
 @jsonify
 def update_app(name):
