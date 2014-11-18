@@ -21,7 +21,8 @@ def create_app():
         runtime = request.form.get('runtime', type=str)
         namespace_id = request.form.get('namespace', type=str)
         project_url = create_nbe_app(name, runtime, namespace_id)
-        return render_template('/manage/create_done.html', project_url=project_url, name=name)
+        if project_url:
+            return render_template('/manage/create_done.html', project_url=project_url, name=name)
 
     namespaces = gitlab.getgroups() or []
     return render_template('/manage/create.html', namespaces=namespaces)
