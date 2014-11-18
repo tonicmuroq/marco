@@ -40,7 +40,7 @@ def container(cid):
                 container=c, app=app, host=host)
     elif request.method == 'POST':
         dot.remove_container(c)
-        return redirect(url_for('app.app_info',
+        return redirect(url_for('app.single_version',
             name=app.name, version=app.version))
 
 

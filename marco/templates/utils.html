@@ -82,7 +82,7 @@
   <div class="list-group app-list">
     <li class="list-group-item list-group-item-info">{{title}}</li>
     {% for app in apps %}
-      <a class="list-group-item" href="{{url_for('app.app_info', name=app.name, version=app.version)}}">
+      <a class="list-group-item" href="{{url_for('app.single_version', name=app.name, version=app.version)}}">
         <span class="label label-success">name: {{app.name}}</span>
         <span class="label label-success">version: {{app.version}}</span>
         <span class="label label-success">time: {{app.created}}</span>
@@ -97,4 +97,14 @@
     {% endfor %}
   </div>
 {% endmacro %}
+
+{% macro panel_div(style, title) %}
+  <div class="panel panel-{{style}}">
+    <div class="panel-heading">{{title}}</div>
+    <div class="panel-body">
+      {{caller()}} 
+    </div>
+  </div>
+{% endmacro %}
+
 {# vim:set ft=jinja: #}
