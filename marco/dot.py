@@ -76,16 +76,16 @@ class DotClient(object):
             raise DotClientError('resource must be in mysql/redis', 400)
         if not env in ('prod', 'test'):
             raise DotClientError('env must be in prod/test', 400)
-        url = '/resource/%s/%s/%s' % (app.name, app.version, resource)
+        url = '/resource/%s/%s' % (app, resource)
         data = {'name': name, 'env': env}
         return self.request(url, method='POST', data=data)
 
-    def set_hook_branch(self, app, branch):
-        url = '/app/%s/branch' % app.name
+    def set_hook_branch(self, app_name, branch):
+        url = '/app/%s/branch' % app_name
         data = {'branch': branch}
         return self.request(url, method='POST', data=data)
 
-    def get_hook_branch(self, app):
-        url = '/app/%s/branch' % app.name
+    def get_hook_branch(self, app_name):
+        url = '/app/%s/branch' % app_name
         r = self.request(url, method='GET')
         return r['branch'] if not r['r'] else 'master'

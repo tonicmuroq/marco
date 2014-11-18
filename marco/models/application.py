@@ -150,3 +150,12 @@ class Application(Base):
         key = self.get_yaml_key('config.yaml')
         value = yaml.safe_dump(config, default_flow_style=False)
         etcd.write(key, value)
+
+
+def get_config_yaml(app_name):
+    try:
+        r = etcd.get('/NBE/%s/config.yaml' % app_name)
+        config = r.value if (r and not r.dir) else '{}'
+    except KeyError:
+        config = '{}'
+    return yaml_loads(config)

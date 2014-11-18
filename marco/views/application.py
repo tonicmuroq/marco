@@ -1,11 +1,9 @@
 # coding: utf-8
 from flask import (Blueprint, request, render_template,
-        abort, g, redirect)
+        abort, g, redirect, url_for)
 
 from marco.ext import openid2, dot
-from marco.models.application import Application
-
-from marco.utils import yaml_loads
+from marco.models.application import Application, get_config_yaml
 
 
 bp = Blueprint('app', __name__, url_prefix='/app')
@@ -35,40 +33,33 @@ def app_set_info(name):
             latest=latest, online_apps=online_apps)
 
 
-@bp.route('/<name>/<version>/resources')
-def app_resource(name, version):
-    app = _get_app(name, version)
-    config = yaml_loads(app.config_yaml)
-    mysqls = {k: v for k, v in config.iteritems() if k.startswith('mysql')}
-    redises = {k: v for k, v in config.iteritems() if k.startswith('redis')}
-    return render_template('/app/app_resource.html',
-            app=app, config=config, mysqls=mysqls, redises=redises)
-
-
-@bp.route('/<name>/settings/', methods=['POST', 'GET', ])
-def app_settings(name):
+@bp.route('/<appname>/settings/', methods=['POST', 'GET', ])
+def settings(appname):
     if request.method == 'POST':
         branch = request.form.get('branch', type=str)
-        dot.set_hook_branch(name, branch)
+        dot.set_hook_branch(appname, branch)
 
-    hook_branch = dot.get_hook_branch(name)
+    hook_branch = dot.get_hook_branch(appname)
+    config = get_config_yaml(appname)
     return render_template('/app/app_settings.html',
-            name=name, hook_branch=hook_branch)
+            appname=appname, hook_branch=hook_branch, config=config)
+
+
+@bp.route('/<appname>/settings/resources', methods=['POST'])
+def add_resource(appname):
+    resource = request.form.get('resource', type=str)
+    name = request.form.get('name', type=str)
+    env = request.form.get('env', type=str)
+    print dot.add_resource(appname, resource, name, env)
+    return redirect(url_for('app.settings', appname=appname))
 
 
 @bp.route('/<name>/<version>/')
-def app_info(name, version):
+def single_version(name, version):
     app = _get_app(name, version)
     ptasks = app.processing_tasks(limit=5)
     tasks = app.tasks(limit=10)
     return render_template('/app/app.html', app=app, ptasks=ptasks, tasks=tasks)
-
-
-@bp.route('/<name>/<version>/tasks')
-def app_tasks(name, version):
-    app = _get_app(name, version)
-    tasks = app.tasks()
-    return render_template('/app/app_task.html', app=app, tasks=tasks)
 
 
 @bp.before_request

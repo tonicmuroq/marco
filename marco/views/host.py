@@ -16,7 +16,7 @@ def index():
     return render_template('/host/index.html', hosts=hosts)
 
 
-@bp.route('/<host_id>/')
+@bp.route('/<int:host_id>/')
 def host_info(host_id):
     host = Host.get(host_id)
     if not host:

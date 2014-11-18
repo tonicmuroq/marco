@@ -1,12 +1,17 @@
 # coding: utf-8
 
 import yaml
-from flask import Blueprint, request, render_template, flash
+from flask import Blueprint, request, render_template, flash, redirect, url_for
 
 from marco.ext import gitlab
 
 
 bp = Blueprint('manage', __name__, url_prefix='/manage')
+
+
+@bp.route('/')
+def index():
+    return redirect(url_for('manage.create_app'))
 
 
 @bp.route('/create', methods=['GET', 'POST'])
