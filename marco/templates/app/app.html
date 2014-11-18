@@ -60,8 +60,18 @@
   </div>
 
   <div class="text-left app-block">
+    <form class="form-inline" role="form">
+      <div class="form-group">
+        <select id="add-daemon" class="form-control">
+          <option value="false">不用Daemon</option>
+          <option value="true">用Daemon跑</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-info btn-add-container" data-url="{{url_for('ajax.app_add_container', app_id=app.id)}}">增加容器</button>
+    </form>
+  </div>
+  <div class="text-left app-block">
     <button type="button" class="btn btn-info btn-test-app" data-url="{{url_for('ajax.app_test_app', app_id=app.id)}}">测试应用</button>
-    <button type="button" class="btn btn-info btn-add-container" data-url="{{url_for('ajax.app_add_container', app_id=app.id)}}">增加容器</button>
     <button type="button" class="btn btn-warning btn-remove-container" data-url="{{url_for('ajax.app_remove_app', app_id=app.id)}}">下线应用</button>
     <button type="button" class="btn btn-info" onclick='statsToggle(this)' style='float: right'>状态监测</button>
     <div style='clear: both'></div>

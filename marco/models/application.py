@@ -152,9 +152,9 @@ class Application(Base):
         etcd.write(key, value)
 
 
-def get_config_yaml(app_name):
+def get_config_yaml(app_name, env):
     try:
-        r = etcd.get('/NBE/%s/config.yaml' % app_name)
+        r = etcd.get('/NBE/%s/resource-%s' % (app_name, env))
         config = r.value if (r and not r.dir) else '{}'
     except KeyError:
         config = '{}'

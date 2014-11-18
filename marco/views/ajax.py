@@ -85,11 +85,12 @@ def app_metric(app_id):
 @jsonify
 def app_add_container(app_id):
     host = Host.get(request.form['host_id'])
+    daemon = request.form.get('daemon', 'false')
     if not host:
         return {'r': 1, 'msg': 'no such host'}
 
     app = _get_app(app_id, validate_process=True)
-    return dot.add_container(app, host)
+    return dot.add_container(app, host, daemon)
 
 
 @bp.route('/app/<app_id>/build', methods=['POST', ])
