@@ -2,7 +2,8 @@ $('.btn-add-container').click(function() {
   var self = $(this),
       url = self.data('url'),
       host = '5';
-  $.post(url, {host_id: host}).fail(function (e){
+  var daemon = $('#add-daemon').val();
+  $.post(url, {host_id: host, daemon: daemon}).fail(function (e){
     alert('出错了');
   }).done(function(r) {
     if (!r.r) {

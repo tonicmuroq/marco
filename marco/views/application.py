@@ -40,7 +40,7 @@ def settings(appname):
         dot.set_hook_branch(appname, branch)
 
     hook_branch = dot.get_hook_branch(appname)
-    config = get_config_yaml(appname)
+    config = get_config_yaml(appname, 'prod')
     return render_template('/app/app_settings.html',
             appname=appname, hook_branch=hook_branch, config=config)
 
@@ -50,7 +50,7 @@ def add_resource(appname):
     resource = request.form.get('resource', type=str)
     name = request.form.get('name', type=str)
     env = request.form.get('env', type=str)
-    print dot.add_resource(appname, resource, name, env)
+    dot.add_resource(appname, resource, name, env)
     return redirect(url_for('app.settings', appname=appname))
 
 

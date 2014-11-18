@@ -39,12 +39,12 @@ class DotClient(object):
 
     def register(self, project_name, version, group, appyaml):
         url = '/app/%s/%s' % (project_name, version)
-        data = {'group': group, 'appyaml': appyaml, 'configyaml': configyaml}
+        data = {'group': group, 'appyaml': appyaml}
         return self.request(url, method='POST', data=data)
 
-    def add_container(self, app, host, daemon=False):
+    def add_container(self, app, host, daemon='false'):
         url = '/app/%s/%s/add' % (app.name, app.version)
-        data = {'host': host.ip, 'daemon': str(daemon).lower()}
+        data = {'host': host.ip, 'daemon': daemon}
         return self.request(url, method='POST', data=data)
         
     def build_image(self, app, host, base):
