@@ -25,7 +25,7 @@ def gitlab_merge():
 
     group = project['namespace']['name']
     projectname = project['name']
-    version = gitlab.listrepositorycommits(project_id)[0]['id'][:7]
+    version = gitlab.listrepositorycommits(project_id, page=0)[0]['id'][:7]
 
     appyaml = gitlab.getrawblob(project_id, version, 'app.yaml') or ''
 

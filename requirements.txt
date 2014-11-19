@@ -5,7 +5,7 @@ MySQL-python
 enum34
 elasticsearch
 influxdb
-pyapi-gitlab
 python-etcd
 python-openid
 -e git+http://git.hunantv.com/tonic/flask-navigator.git#egg=flask_navigator
+-e git+http://git.hunantv.com/mirror/pyapi-gitlab.git#egg=gitlab

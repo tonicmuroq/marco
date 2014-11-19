@@ -1,0 +1,50 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block title %}
+  Marco Manage
+{% endblock %}
+
+{% block main_right %}
+  <div class="panel panel-info">
+    <div class="panel-heading">导入一个应用</div>
+    <div class="panel-body">
+      <form class="form-horizontal" role="form" action="{{url_for('manage.import_app')}}" method="post">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Gitlab 地址</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" name="addr">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">运行环境</label>
+          <div class="col-sm-10">
+            <select id="" class="form-control" name="runtime">
+              <option value="python">Python</option>
+              <option value="java">Java</option>
+              <option value="php">PHP</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="appyaml">
+                帮我创建一个app.yaml (需要你的仓库已经有分支了, 空仓库创建会失败)
+              </label>
+            </div>
+          </div>
+        </div>
+        {{utils.error_display_in_form('form-group', 'col-sm-offset-2 col-sm-10')}}
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-info">OK, Import</button>
+          </div>
+        </div>
+      </form>
+  </div>
+  </div>
+{% endblock %}
+
+{# vim:set ft=jinja: #}

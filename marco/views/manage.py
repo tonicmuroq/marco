@@ -1,10 +1,14 @@
 # coding: utf-8
 
 import yaml
+import urllib
+import urlparse
 from flask import Blueprint, request, render_template, flash, redirect, url_for
 
-from marco.ext import gitlab
+from marco.ext import gitlab, dot
+from marco.utils import yaml_to_json
 
+HOOK_URL = 'http://marco.intra.hunantv.com/hook/gitlab/merge'
 
 bp = Blueprint('manage', __name__, url_prefix='/manage')
 
@@ -20,11 +24,28 @@ def create_app():
         name = request.form.get('name', type=str)
         runtime = request.form.get('runtime', type=str)
         namespace_id = request.form.get('namespace', type=str)
-        project_url = create_nbe_app(name, runtime, namespace_id)
-        return render_template('/manage/create_done.html', project_url=project_url, name=name)
+        project = create_nbe_app(name, runtime, namespace_id)
+        if project:
+            return render_template('/manage/create_done.html',
+                    project_url=project['web_url'], name=project['name'])
 
     namespaces = gitlab.getgroups() or []
     return render_template('/manage/create.html', namespaces=namespaces)
+
+
+@bp.route('/import', methods=['GET', 'POST'])
+def import_app():
+    if request.method == 'POST':
+        addr = request.form.get('addr', type=str)
+        runtime = request.form.get('runtime', type=str)
+        appyaml = request.form.get('appyaml', type=str, default='off')
+        
+        project = import_nbe_app(addr, runtime, appyaml=='on')
+        if project:
+            return render_template('/manage/create_done.html',
+                    project_url=project['web_url'], name=project['name'])
+        flash(u'导入失败', 'error')
+    return render_template('/manage/import.html')
 
 
 def create_nbe_app(name, runtime, namespace_id):
@@ -37,11 +58,56 @@ def create_nbe_app(name, runtime, namespace_id):
     if not project:
         flash(u'项目创建失败', 'error')
         return
+
     # 这绝逼失败的好么, gitlab 也没给个创建分支的API
     if not gitlab.createfile(project['id'], 'app.yaml', 'master', app_yaml, 'NBE AutoCommit'):
         flash(u'app.yaml创建失败', 'error')
         return
-    if not gitlab.addprojecthook(project['id'], 'http://marco.intra.hunantv.com/hook/gitlab/merge'):
-        flash(u'hook创建失败', 'error')
+
+    hooks = gitlab.getprojecthooks(project['id'])
+    has_hook = any(h['url'] == HOOK_URL and h['merge_requests_events'] for h in hooks)
+    if not has_hook:
+        if not gitlab.addprojecthook(project['id'], 'http://marco.intra.hunantv.com/hook/gitlab/merge'):
+            flash(u'hook创建失败', 'error')
+            return
+
+    return project
+
+
+def import_nbe_app(addr, runtime, with_app_yaml=True):
+    parsed = urlparse.urlparse(addr)
+    if not parsed.path:
+        flash(u'Gitlab 地址格式不对, 请填写项目的URL', 'error')
         return
-    return project['web_url']
+
+    project = gitlab.getproject(urllib.quote(parsed.path[1:], safe=''))
+    if not project:
+        flash(u'项目导入失败, 真的有这个项目咩?', 'error')
+        return
+
+    project_id = project['id']
+    project_name = project['name']
+
+    if with_app_yaml:
+        app_yaml = render_template('/nbe/app.yaml', name=project_name, runtime=runtime)
+        # 如果又要创建 app.yaml 又没有一个 master 分支的话是肯定会挂的
+        if not gitlab.createfile(project_id, 'app.yaml', 'master', app_yaml, 'NBE: Create app.yaml'):
+            flash(u'app.yaml 创建失败', 'error')
+            return
+
+    hooks = gitlab.getprojecthooks(project_id)
+    has_hook = any(h['url'] == HOOK_URL and h['merge_requests_events'] for h in hooks)
+    if not has_hook:
+        if not gitlab.addprojecthook(project_id, HOOK_URL, merge_requests=True):
+            flash(u'hook创建失败', 'error')
+
+    commits = gitlab.listrepositorycommits(project_id, page=0)
+    if commits:
+        version = commits[0]['id'][:7]
+        group = project['namespace']['name']
+        app_yaml = gitlab.getrawblob(project_id, version, 'app.yaml')
+        if not app_yaml:
+            app_yaml = render_template('/nbe/app.yaml', name=project_name, runtime=runtime)
+        dot.register(project_name, version, group, yaml_to_json(app_yaml))
+
+    return project
