@@ -1,0 +1,38 @@
+appname: "{{name}}"
+runtime: "{{runtime}}"
+
+# port defines the intra port
+# which your app runs
+# port: 5000
+
+# build defines the command when build the image
+# it's a list
+# now we run only the first command
+# if you have multi commands, use '&&' to join them like in shell
+# no interactive operation is allowed, always use -y option
+# build:
+#   - "apt-get install -y libssl-dev && pip install -r ./requirements.txt"
+
+# cmd defines the command when start the app
+# the same as build
+# cmd must NOT be daemon
+# cmd:
+#   - "python app.py"
+
+# daemon defines the command when your app starts in daemon mode
+# the same as build
+# daemon must NOT be real-daemon, it's only a front-end process running like daemon
+# daemon:
+#   - "python daemon.py"
+
+# test defines the command when your app runs test
+# the same as build
+# test:
+#   - "./runtest.sh"
+
+# static defines the static folder if your app has
+# use this value in your template
+# e.g. src="/marco/static/js/..."
+# static: "marco/static"
+
+{# vim:set ft=jinja: #}
