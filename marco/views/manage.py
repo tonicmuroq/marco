@@ -8,6 +8,7 @@ from flask import Blueprint, request, render_template, flash, redirect, url_for
 from marco.ext import gitlab, dot
 from marco.utils import yaml_to_json
 
+HOOK_URL = 'http://marco.intra.hunantv.com/hook/gitlab/merge'
 
 bp = Blueprint('manage', __name__, url_prefix='/manage')
 
@@ -57,13 +58,19 @@ def create_nbe_app(name, runtime, namespace_id):
     if not project:
         flash(u'项目创建失败', 'error')
         return
+
     # 这绝逼失败的好么, gitlab 也没给个创建分支的API
     if not gitlab.createfile(project['id'], 'app.yaml', 'master', app_yaml, 'NBE AutoCommit'):
         flash(u'app.yaml创建失败', 'error')
         return
-    if not gitlab.addprojecthook(project['id'], 'http://marco.intra.hunantv.com/hook/gitlab/merge'):
-        flash(u'hook创建失败', 'error')
-        return
+
+    hooks = gitlab.getprojecthooks(project['id'])
+    has_hook = any(h['url'] == HOOK_URL and h['merge_requests_events'] for h in hooks)
+    if not has_hook:
+        if not gitlab.addprojecthook(project['id'], 'http://marco.intra.hunantv.com/hook/gitlab/merge'):
+            flash(u'hook创建失败', 'error')
+            return
+
     return project
 
 
@@ -82,17 +89,17 @@ def import_nbe_app(addr, runtime, with_app_yaml=True):
     project_name = project['name']
 
     if with_app_yaml:
-        app_yaml = render_template('/nbe/app.yaml',
-                name=project_name, runtime=runtime)
-        if not gitlab.createfile(project_id, 'app.yaml',
-                'master', app_yaml, 'NBE: Create app.yaml'):
+        app_yaml = render_template('/nbe/app.yaml', name=project_name, runtime=runtime)
+        # 如果又要创建 app.yaml 又没有一个 master 分支的话是肯定会挂的
+        if not gitlab.createfile(project_id, 'app.yaml', 'master', app_yaml, 'NBE: Create app.yaml'):
             flash(u'app.yaml 创建失败', 'error')
             return
 
-    if not gitlab.addprojecthook(project['id'], 'http://marco.intra.hunantv.com/hook/gitlab/merge',
-            merge_requests=True):
-        flash(u'hook创建失败', 'error')
-        return
+    hooks = gitlab.getprojecthooks(project_id)
+    has_hook = any(h['url'] == HOOK_URL and h['merge_requests_events'] for h in hooks)
+    if not has_hook:
+        if not gitlab.addprojecthook(project_id, HOOK_URL, merge_requests=True):
+            flash(u'hook创建失败', 'error')
 
     commits = gitlab.listrepositorycommits(project_id, page=0)
     if commits:
@@ -100,8 +107,7 @@ def import_nbe_app(addr, runtime, with_app_yaml=True):
         group = project['namespace']['name']
         app_yaml = gitlab.getrawblob(project_id, version, 'app.yaml')
         if not app_yaml:
-            app_yaml = render_template('/nbe/app.yaml',
-                    name=project_name, runtime=runtime)
+            app_yaml = render_template('/nbe/app.yaml', name=project_name, runtime=runtime)
         dot.register(project_name, version, group, yaml_to_json(app_yaml))
 
     return project
