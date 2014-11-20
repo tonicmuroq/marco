@@ -1,0 +1,31 @@
+{% extends "/base.html" %}
+
+{% block title %}
+  Marco Startup
+{% endblock %}
+
+{% block main_left %}
+  <div class="list-group">
+    <a class="list-group-item" href="{{url_for('manage.import_app')}}">导入已有项目</a>
+    <a class="list-group-item" href="{{url_for('manage.create_app')}}">创建新项目</a>
+    <a class="list-group-item" href="{{url_for('app.index')}}">看看已有项目</a>
+  </div>
+{% endblock %}
+
+{% block main_right %}
+  <ul>
+    <li>
+      <p>导入一个已有的Gitlab上的项目, 但是你要注意, 项目必须已经<mark>至少有一个分支.</mark></p>
+      <p>那种点进去告诉你怎么样添加一个README的是不行的.</p>
+    </li>
+    <li>
+      <p>直接创建一个新的项目, 会同时帮你创建Gitlab上的repo, 但是并没有app.yaml.</p>
+      <p><del>不知道Gitlab会不会给类似的API去push一个. Gitlab是渣渣.</del></p>
+    </li>
+    <li>
+      <p>看看已有项目吧, 但是不一定每个都可以看到详细信息.</p>
+    </li>
+  </ul>
+{% endblock %}
+
+{# vim:set ft=jinja: #}
