@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from flask import g, redirect, url_for, Blueprint, render_template
+from flask import g, redirect, Blueprint, render_template
 
 from marco.ext import openid2
 
