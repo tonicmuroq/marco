@@ -37,10 +37,8 @@ class DotClient(object):
         raise RuntimeError('need username set')
 
     def request(self, url, method='GET', params=None, data=None, json=True, expected_code=200, need_user=True):
-        headers = {}
-        if need_user:
-            username = self._get_username()
-            headers = {'NBE-user': username}
+        username = self._get_username() if need_user else 'NBEBot'
+        headers = {'NBE-user': username}
 
         target_url = urljoin(self._base_url, url)
         resp = session.request(method=method, url=target_url, params=params,
@@ -54,7 +52,7 @@ class DotClient(object):
     def register(self, project_name, version, group, appyaml):
         url = '/app/%s/%s' % (project_name, version)
         data = {'group': group, 'appyaml': appyaml}
-        return self.request(url, method='POST', data=data)
+        return self.request(url, method='POST', data=data, need_user=False)
 
     def add_container(self, app, host, daemon='false'):
         url = '/app/%s/%s/add' % (app.name, app.version)
