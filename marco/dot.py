@@ -99,5 +99,5 @@ class DotClient(object):
 
     def get_hook_branch(self, app_name):
         url = '/app/%s/branch' % app_name
-        r = self.request(url, method='GET')
+        r = self.request(url, method='GET', need_user=False)
         return r['branch'] if not r['r'] else 'master'
