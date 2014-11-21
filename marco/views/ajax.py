@@ -52,19 +52,8 @@ def update_app(name):
 def app_all_metric(app_id):
     app = _get_app(app_id)
     data = app.all_realtime_metric_data(
-        int(request.args.get('time', 10)), int(request.args.get('limit', 100)))
+        request.args.get('time', type=int, default=10), request.args.get('limit', type=int, default=100))
     return {k: v.get('points', []) for k, v in data.iteritems()}
-
-
-@bp.route('/app/<app_id>/metrics')
-@jsonify
-def app_metric(app_id):
-    app = _get_app(app_id)
-    metric_name = request.args.get('metric_name', 'cpu_usage')
-    data = app.realtime_metric_data(metric_name)
-    points = [{'series': 0, 'x': p[0], 'y': p[1]}
-              for p in data.get('points', [])]
-    return {'data': [{'key': data['name'], 'values': points}, ]}
 
 
 @bp.route('/app/<app_id>/add', methods=['POST', ])

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import requests
+from flask import g, has_request_context
 from urlparse import urljoin
 
 session = requests.Session()
@@ -17,7 +18,7 @@ class DotClientError(Exception):
 class DotClient(object):
 
     def __init__(self, host='localhost', port=5000, timeout=5,
-            scheme='http'):
+            scheme='http', username=''):
         self._host = host
         self._port = port
         self._timeout = timeout
@@ -26,11 +27,24 @@ class DotClient(object):
                 self._scheme,
                 self._host,
                 self._port)
+        self._username = username
 
-    def request(self, url, method='GET', params=None, data=None, json=True, expected_code=200):
+    def _get_username(self):
+        if has_request_context() and g.user:
+            return g.user.username
+        if self._username:
+            return self._username
+        raise RuntimeError('need username set')
+
+    def request(self, url, method='GET', params=None, data=None, json=True, expected_code=200, need_user=True):
+        headers = {}
+        if need_user:
+            username = self._get_username()
+            headers = {'NBE-user': username}
+
         target_url = urljoin(self._base_url, url)
         resp = session.request(method=method, url=target_url, params=params,
-                data=data, timeout=self._timeout)
+                data=data, timeout=self._timeout, headers=headers)
         if resp.status_code != expected_code:
             raise DotClientError(resp.content, resp.status_code)
         if json:
