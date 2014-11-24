@@ -28,12 +28,12 @@
     <li class="list-group-item"><span class="task-label">任务结果:</span><span>{{st.result}}</span></li>
   </div>
 
-  <div class="alert alert-info" role="alert" id="task-log">
   {% if st.processing() %}
+    <pre id="task-log"></pre>
     <script>
       var ws = new WebSocket('{{ws_url}}');
       ws.onmessage = function(e) {
-          $('#task-log').append('<p>'+e.data+'</p>');
+          $('#task-log').append('\n' + e.data);
       }
       ws.onopen = function(e) {
           $('#task-log').html('Connected');
@@ -42,20 +42,18 @@
           $('#task-log').removeClass('alert-info').addClass('alert-error');
       }
       ws.onclose = function(e) {
-          $('#task-log').append('<p>Closed</p>');
+          $('#task-log').append('Closed');
       }
     </script>
   {% else %}
-    {% for line in logs %}
-      <p>{{line}}</p>
-    {% endfor %}
+      <pre>{{'\n'.join(logs)}}</pre>
   {% endif %}
-  </div>
 
 {% endblock %}
 
 {% block more_css %}
   .task-label { margin-right: 10px; font-weight: bold; }
+  pre {word-break: initial !important; word-wrap: normal;}
 {% endblock %}
 
 {# vim:set ft=jinja: #}
