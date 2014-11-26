@@ -107,4 +107,30 @@
   </div>
 {% endmacro %}
 
+{% macro modal(id, title, ok, close, ok_style, sync=True) %}
+  <div class="modal fade" id="{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header modal-info">
+          <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span><span class="sr-only">{{close}}</span>
+          </button>
+          <h4 class="modal-title">{{title}}</h4>
+        </div>
+        <div class="modal-body">
+          {{caller()}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{close}}</button>
+          {% if sync %}
+            <button type="submit" class="btn btn-info {{ok_style|safe}}">{{ok}}</button>
+          {% else %}
+            <button type="button" class="btn btn-info {{ok_style|safe}}">{{ok}}</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
 {# vim:set ft=jinja: #}
