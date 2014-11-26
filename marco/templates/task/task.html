@@ -34,6 +34,7 @@
       var ws = new WebSocket('{{ws_url}}');
       ws.onmessage = function(e) {
           $('#task-log').append('\n' + e.data);
+          $(window).scrollTop($(document).height() - $(window).height());
       }
       ws.onopen = function(e) {
           $('#task-log').html('Connected');
