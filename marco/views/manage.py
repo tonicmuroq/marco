@@ -20,7 +20,7 @@ def create_app_ajax():
     name = request.form.get('name', type=str)
     runtime = request.form.get('runtime', type=str)
     namespace_id = request.form.get('namespace', type=str)
-    error, project = create_nbe_app(name, runtime, namespace_id)
+    error, project = create_nbe_app(name.lower(), runtime, namespace_id)
     return {'r': int(bool(error)), 'error': error, 'project': project}
 
 
@@ -67,7 +67,7 @@ def import_nbe_app(addr, runtime, with_app_yaml=False):
         return u'项目导入失败, 真的有这个项目咩?', None
 
     project_id = project['id']
-    project_name = project['name']
+    project_name = project['name'].lower()
 
     if with_app_yaml:
         app_yaml = render_template('/nbe/app.yaml', name=project_name, runtime=runtime)
