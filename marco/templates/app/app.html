@@ -53,6 +53,7 @@
         <select id="build-base" class="form-control">
           <option value="docker-registry.intra.hunantv.com/nbeimage/ubuntu:python-2014.11.28">python-2014.11.28</option>
           <option value="docker-registry.intra.hunantv.com/nbeimage/ubuntu:java-2014.11.28">java-2014.11.28</option>
+          <option value="docker-registry.intra.hunantv.com/nbeimage/ubuntu:nodejs-2014.12.1">nodejs-2014.12.1</option>
         </select>
       </div>
       <button type="button" class="btn btn-info btn-build-image" data-url="{{url_for('ajax.app_build_image', app_id=app.id)}}">构建镜像</button>
