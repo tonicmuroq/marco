@@ -7,7 +7,6 @@ from marco.models.host import Host
 from marco.models.container import Container
 from marco.models.application import Application
 
-from marco.utils import yaml_loads
 from marco.views.utils import jsonify
 
 
@@ -71,12 +70,19 @@ def app_add_container(app_id):
 @bp.route('/app/<app_id>/build', methods=['POST', ])
 @jsonify
 def app_build_image(app_id):
+    _runtime = {
+        'python': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:python-2014.11.28',
+        'java': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:java-2014.11.28',
+        'nodejs': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:nodejs-2014.12.1',
+    }
     base = request.form['base']
     host = Host.get(request.form['host_id'])
     if not host:
         return {'r': 1, 'msg': 'no such host'}
 
     app = _get_app(app_id, validate_process=True)
+    if base == 'auto':
+        base = _runtime.get(app.runtime, '')
     return dot.build_image(app, host, base)
 
 
@@ -108,9 +114,7 @@ def app_remove_app(app_id):
 @jsonify
 def app_sync_db(app_id):
     app = _get_app(app_id)
-
-    y = yaml_loads(app.app_yaml)
-    schema = y.get('schema', '')
+    schema = app.app_yaml.get('schema', '')
     if schema:
         sql = gitlab.getrawblob(app.gitlab_id, app.version, schema)
         return {'r': sql}
