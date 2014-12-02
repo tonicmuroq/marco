@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import yaml
 import json
 import logging
 from urllib2 import quote
@@ -53,14 +52,6 @@ class Application(Base):
     @classmethod
     def get(cls, id):
         return db.session.query(cls).filter(cls.id == id).first()
-
-    def get_yaml_key(self, kind):
-        return '/NBE/{self.name}/{self.version}/{kind}'.format(self=self, kind=kind)
-
-    def get_yaml(self, kind):
-        r = etcd.get(self.get_yaml_key(kind))
-        return r.value if (r and not r.dir) else '{}'
-
     def mysql_args_dict(self):
         key = '/NBE/{self.name}/mysql'.format(self=self)
         r = etcd.get(key)
@@ -69,19 +60,16 @@ class Application(Base):
 
     @cached_property
     def app_yaml(self):
-        return self.get_yaml('app.yaml')
+        try:
+            r = etcd.get('/NBE/{self.name}/{self.version}/app.yaml'.format(self=self))
+            app_yaml = r.value if (r and not r.dir) else '{}'
+        except KeyError:
+            app_yaml = '{}'
+        return yaml_loads(app_yaml)
 
     @cached_property
-    def config_yaml(self):
-        return self.get_yaml('config.yaml')
-
-    @cached_property
-    def test_yaml(self):
-        return self.get_yaml('test.yaml')
-
-    @cached_property
-    def original_config_yaml(self):
-        return self.get_yaml('original-config.yaml')
+    def runtime(self):
+        return self.app_yaml['runtime']
 
     @cached_property
     def containers(self):
@@ -104,10 +92,6 @@ class Application(Base):
     @property
     def gitlab_id(self):
         return quote('%s/%s' % (self.group, self.name), safe='')
-
-    def is_daemon(self):
-        y = yaml_loads(self.app_yaml)
-        return y.get('daemon', False)
 
     def tasks(self, status=None, succ=None, start=0, limit=20):
         from .task import StoredTask
@@ -139,18 +123,6 @@ class Application(Base):
         except StandardError, e:
             logging.exception(e)
             return {'data': [], 'name': ''}
-
-    def add_store_instance(self, kind, connection_args):
-        if not kind in ('mysql', 'redis'):
-            return
-        config = yaml_loads(self.config_yaml)
-        if kind in config:
-            return
-        config[kind] = connection_args
-        key = self.get_yaml_key('config.yaml')
-        value = yaml.safe_dump(config, default_flow_style=False)
-        etcd.write(key, value)
-
 
 def get_config_yaml(app_name, env):
     try:
