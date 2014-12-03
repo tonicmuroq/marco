@@ -6,7 +6,9 @@
 {% endblock %}
 
 {% block main_left %}
-  {{utils.left_bar(nav.app_sub_nav)}}
+  <div class="list-group">
+    <a class="list-group-item" href="{{url_for('app.single_version', name=app.name, version=app.version)}}">{{app.name}} @ {{app.version}}</a>
+  </div>
 {% endblock %}
 
 {% block main_right %}

@@ -17,7 +17,7 @@
     <div class="list-group">
       <div class="list-group-item list-group-item-info">最近的活动列表</div>
       {% for task in tasks %}
-        <a class="list-group-item" href="{{url_for('task.task', task_id=task.id)}}" target="_blank">
+        <a class="list-group-item" href="{{url_for('task.task', task_id=task.id)}}">
           <span class="label label-info">{{task.repr()}}</span>
           {% if task.success() %}
             <span class="label label-success">成功</span>
@@ -50,6 +50,13 @@
   <div class="text-left">
     <form class="form-inline" role="form">
       <div class="form-group">
+        <select id="build-host" class="form-control">
+          {% for host in hosts %}
+          <option value="{{host.id}}">{{host.ip}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
         <select id="build-base" class="form-control">
           <option value="auto">根据runtime自动选</option>
           <option value="docker-registry.intra.hunantv.com/nbeimage/ubuntu:python-2014.11.28">python-2014.11.28</option>
@@ -63,6 +70,13 @@
 
   <div class="text-left app-block">
     <form class="form-inline" role="form">
+      <div class="form-group">
+        <select id="add-host" class="form-control">
+          {% for host in hosts %}
+          <option value="{{host.id}}">{{host.ip}}</option>
+          {% endfor %}
+        </select>
+      </div>
       <div class="form-group">
         <select id="add-daemon" class="form-control">
           <option value="false">不用Daemon</option>
