@@ -1,8 +1,8 @@
 $('.btn-add-container').click(function() {
   var self = $(this),
       url = self.data('url'),
-      host = '5';
-  var daemon = $('#add-daemon').val();
+  var daemon = $('#add-daemon').val(),
+      host = $('#add-host').val();
   $.post(url, {host_id: host, daemon: daemon}).fail(function (e){
     alert('出错了');
   }).done(function(r) {
@@ -19,7 +19,7 @@ $('.btn-build-image').click(function() {
   var self = $(this),
     url = self.data('url'),
     base = $('#build-base').val(),
-    host = '5';
+    host = $('#build-host').val();
   $.post(url, {host_id: host, base: base}).fail(function (e){
     alert('出错了');
   }).done(function(r) {

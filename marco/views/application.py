@@ -3,6 +3,7 @@ from flask import (Blueprint, request, render_template,
         abort, g, redirect, url_for)
 
 from marco.ext import openid2, dot
+from marco.models.host import Host
 from marco.models.application import Application, get_config_yaml
 
 
@@ -59,7 +60,9 @@ def single_version(name, version):
     app = _get_app(name, version)
     ptasks = app.processing_tasks(limit=5)
     tasks = app.tasks(limit=10)
-    return render_template('/app/app.html', app=app, ptasks=ptasks, tasks=tasks)
+    hosts = Host.all_hosts()
+    return render_template('/app/app.html', app=app,
+            ptasks=ptasks, tasks=tasks, hosts=hosts)
 
 
 @bp.before_request

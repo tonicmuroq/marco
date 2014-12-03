@@ -16,7 +16,8 @@ def task(task_id):
         abort(404)
     logs = st.logs(size=300)
     ws_url = current_app.config['DOT_LOG_URL'] + '?task=%s' % task_id
-    return render_template('/task/task.html', st=st, logs=logs, ws_url=ws_url)
+    return render_template('/task/task.html', st=st, logs=logs, ws_url=ws_url,
+            app=st.application)
 
 
 @bp.before_request
