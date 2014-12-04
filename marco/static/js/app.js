@@ -1,7 +1,7 @@
 $('.btn-add-container').click(function() {
   var self = $(this),
       url = self.data('url'),
-  var daemon = $('#add-daemon').val(),
+      daemon = $('#add-daemon').val(),
       host = $('#add-host').val();
   $.post(url, {host_id: host, daemon: daemon}).fail(function (e){
     alert('出错了');
