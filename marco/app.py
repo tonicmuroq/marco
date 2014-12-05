@@ -4,13 +4,14 @@ import os
 import yaml
 import logging
 
-from flask import Flask
+from flask import Flask, request, g
 from werkzeug.utils import import_string
 
 from marco.ext import db, etcd, es, influxdb, openid2, dot, gitlab
 from marco.views.navigator import init_nav
 
 blueprints = (
+    'env',
     'ajax',
     'index',
     'host',
@@ -51,5 +52,9 @@ def create_app():
     for bp in blueprints:
         import_name = '%s.views.%s:bp' % (__package__, bp)
         app.register_blueprint(import_string(import_name))
+
+    @app.before_request
+    def get_dot_env():
+        g.dot_env = request.cookies.get('dotenv', 'intra')
 
     return app
