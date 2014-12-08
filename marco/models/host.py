@@ -12,6 +12,7 @@ class Host(Base):
 
     ip = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255))
+    status = db.Column(db.Integer)
 
     @classmethod
     def get_by_ip(cls, ip):
@@ -27,6 +28,9 @@ class Host(Base):
         if limit is not None:
             q = q.limit(limit)
         return q.all()
+
+    def is_online(self):
+        return self.status == 0
 
     @cached_property
     def containers(self):
