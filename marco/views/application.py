@@ -4,14 +4,14 @@ from flask import (Blueprint, request, render_template,
 
 from marco.ext import openid2, dot
 from marco.models.host import Host
-from marco.models.application import Application, get_config_yaml
+from marco.models.application import Application, AppVersion, get_config_yaml
 
 
 bp = Blueprint('app', __name__, url_prefix='/app')
 
 
 def _get_app(name, version):
-    app = Application.get_by_name_and_version(name, version)
+    app = AppVersion.get_by_name_and_version(name, version)
     if not app:
         abort(404)
     return app
@@ -25,13 +25,13 @@ def index():
 
 @bp.route('/<name>/')
 def app_set_info(name):
-    apps = Application.get_multi(name)
-    if not apps:
+    app = Application.get_by_name(name)
+    if not app:
         abort(404)
-    latest = apps[0]
+    apps = app.all_versions()
     online_apps = [a for a in apps if a.n_container]
     return render_template('/app/app_set.html', apps=apps,
-            latest=latest, online_apps=online_apps)
+            latest=apps[0], online_apps=online_apps)
 
 
 @bp.route('/<appname>/settings/', methods=['POST', 'GET', ])

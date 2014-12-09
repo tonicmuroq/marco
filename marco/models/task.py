@@ -24,11 +24,12 @@ apptype_dict = {
 }
 
 
-class StoredTask(Base):
+class Job(Base):
 
-    __tablename__ = 'stored_task'
+    __tablename__ = 'job'
 
-    app_id = db.Column(db.Integer, nullable=False)
+    app_name = db.Column(db.String(255))
+    app_version = db.Column(db.String(255))
     status = db.Column(db.Integer, nullable=False)
     succ = db.Column(db.Integer, nullable=False)
     kind = db.Column(db.Integer, nullable=False)
@@ -41,8 +42,10 @@ class StoredTask(Base):
         return db.session.query(cls).filter(cls.id == id).one()
 
     @classmethod
-    def get_multi(cls, app_id, status=None, succ=None, start=0, limit=20):
-        q = db.session.query(cls).filter(cls.app_id == app_id)        
+    def get_multi(cls, app_name, app_version=None, status=None, succ=None, start=0, limit=20):
+        q = db.session.query(cls).filter(cls.app_name == app_name)        
+        if app_version is not None:
+            q = q.filter(cls.app_version == app_version)
         if status is not None:
             q = q.filter(cls.status == status.value)
         if succ is not None:
@@ -74,7 +77,7 @@ class StoredTask(Base):
         apptype = apptype_dict.get(TaskType(self.kind), '')
         if not apptype:
             return []
-        q = 'apptype:%s AND name:%s AND id:%s' % (apptype, self.application.name, self.id)
+        q = 'apptype:%s AND name:%s AND id:%s' % (apptype, self.app_name, self.id)
         r = es.search(q=q, size=size, sort='count', timeout=timeout)
         try:
             logs = [d['_source']['data'] for d in r['hits']['hits']]
@@ -85,7 +88,12 @@ class StoredTask(Base):
     @cached_property
     def application(self):
         from .application import Application
-        return Application.get(self.app_id)
+        return Application.get_by_name(self.app_name)
+
+    @cached_property
+    def appversion(self):
+        from .application import AppVersion
+        return AppVersion.get_by_name_and_version(self.app_name, self.app_version)
 
     @cached_property
     def test_id(self):
