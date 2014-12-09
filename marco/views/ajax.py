@@ -37,7 +37,7 @@ def update_app(name):
     cs = Container.get_multi_by_app_name(name)
     update_args = {}
     for c in cs:
-        update_args.setdefault(c.application.version, []).append(c.host.ip)
+        update_args.setdefault(c.appversion.version, []).append(c.host.ip)
     for version, hosts in update_args.iteritems():
         if version == to_version:
             continue
@@ -50,7 +50,7 @@ def update_app(name):
 @jsonify
 def app_all_metric(app_id):
     app = _get_app(app_id)
-    data = app.all_realtime_metric_data(
+    data = app.application.all_realtime_metric_data(
         request.args.get('time', type=int, default=10), request.args.get('limit', type=int, default=100))
     return {k: v.get('points', []) for k, v in data.iteritems()}
 
