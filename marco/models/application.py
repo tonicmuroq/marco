@@ -95,6 +95,10 @@ class AppVersion(Base):
     image_addr = db.Column(db.String(255), nullable=False)
 
     @classmethod
+    def get(cls, id):
+        return db.session.query(cls).filter(cls.id == id).one()
+
+    @classmethod
     def get_by_name_and_version(cls, name, version):
         return db.session.query(cls).filter(cls.name == name, cls.version == version).one()
 
@@ -120,6 +124,10 @@ class AppVersion(Base):
 
     def processing(self):
         return len(self.processing_tasks(limit=1)) > 0
+
+    @cached_property
+    def application(self):
+        return Application.get_by_name(self.name)
 
     @cached_property
     def runtime(self):

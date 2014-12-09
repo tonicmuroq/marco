@@ -61,7 +61,7 @@ class DotClient(object):
         
     def build_image(self, app, host, base):
         url = '/app/%s/%s/build' % (app.name, app.version)
-        data = {'host': host.ip, 'base': base, 'group': app.group}
+        data = {'host': host.ip, 'base': base, 'group': app.application.namespace}
         return self.request(url, method='POST', data=data)
 
     def test_app(self, app, host):

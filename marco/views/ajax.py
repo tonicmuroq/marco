@@ -5,7 +5,7 @@ from flask import Blueprint, request, g
 from marco.ext import dot, gitlab
 from marco.models.host import Host
 from marco.models.container import Container
-from marco.models.application import Application
+from marco.models.application import Application, AppVersion
 
 from marco.views.utils import jsonify
 
@@ -22,7 +22,7 @@ class AppNotFoundError(Exception):
 
 
 def _get_app(id, validate_process=False):
-    app = Application.get(id)
+    app = AppVersion.get(id)
     if not app:
         raise AppNotFoundError()
     if validate_process and app.processing():
