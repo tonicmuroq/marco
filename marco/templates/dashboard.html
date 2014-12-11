@@ -1,0 +1,33 @@
+{% extends "/ui.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main_right %}
+  <div class="list-group">
+    <li class="list-group-item list-group-item-info">应用列表</li>
+    {% for app_name in app_names %}
+      <li class="list-group-item">
+        <span class="glyphicon glyphicon-cloud-upload"></span>
+        <a href="{{url_for('app.app_set_info', name=app_name)}}">{{app_name}}</a>
+        <a href="#" class="pull-right collect-app-btn" data-url="{{url_for('app.collect', name=app_name)}}"><i class="fa fa-star{{'' if app_name in g.collected_apps else '-o'}}"></i></a>
+      </li>
+    {% endfor %}
+    <script>
+      $(document).ready(function (){
+        $('.collect-app-btn').click(function (e){
+          e.preventDefault();
+          var self = $(this),
+            url = self.data('url');
+          $.post(url, {}, function (r){
+            if (r.action == 'add') {
+              self.find('i').attr('class', 'fa fa-star');
+            } else if (r.action == 'remove') {
+              self.find('i').attr('class', 'fa fa-star-o');
+            } else {
+              console.log('not right action');
+            }
+          });
+        });
+      });
+    </script>
+  </div>
+{% endblock %}

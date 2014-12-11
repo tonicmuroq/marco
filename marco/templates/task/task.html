@@ -7,7 +7,7 @@
 
 {% block main_left %}
   <div class="list-group">
-    <a class="list-group-item" href="{{url_for('app.single_version', name=app.name, version=app.version)}}">{{app.name}} @ {{app.version}}</a>
+    <a class="list-group-item" href="{{url_for('app.app_version', name=app.name, version=app.version)}}">{{app.name}} @ {{app.version}}</a>
   </div>
 {% endblock %}
 

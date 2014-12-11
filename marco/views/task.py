@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from flask import Blueprint, abort, render_template, g, redirect, current_app
+from flask import Blueprint, request, abort, render_template, g, redirect, current_app
 
 from marco.ext import openid2
 from marco.models.task import Job
@@ -14,7 +14,8 @@ def task(task_id):
     st = Job.get(task_id)
     if not st:
         abort(404)
-    logs = st.logs(size=300)
+    limit = request.args.get('limit', type=int, default=300)
+    logs = st.logs(size=limit)
     ws_url = current_app.config['DOT_LOG_URL'] + '?task=%s' % task_id
     return render_template('/task/task.html', st=st, logs=logs, ws_url=ws_url,
             app=st.appversion)

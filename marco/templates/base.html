@@ -7,6 +7,7 @@
 
     <!-- Le styles -->
     <link href="/marco/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/marco/static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <script src="/marco/static/js/jquery-2.1.1.min.js"></script>
     <script src="/marco/static/js/bootstrap.min.js"></script>
     {% block more_header %}{% endblock %}
@@ -22,24 +23,14 @@
     <header class="navbar navbar-default navbar-fixed-top bs-docs-nav" role="banner">
       <div class="container">
         <div class="navbar-header">
-          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="{{ url_for('host.index') }}" class="navbar-brand">Marco</a>
+          <a href="{{url_for('index.index')}}" class="navbar-brand">Marco</a>
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
           <div class="nav navbar-nav">
-            {% for item in nav.marco_nav%}
-              <li class="{{'active' if item.is_active else ''}}">
-                <a href="{{item.url}}">{{item.label}}</a>
-              </li>
-            {% endfor %}
+            <p class="navbar-text">On marco @ version</p>
           </div>
           <div class="nav navbar-nav navbar-right">
-            <li><a href="#" id="dot-switcher">{{g.dot_env}}</a></li>
+            <li><a href="" id="dot-switcher">{{g.dot_env}}</a></li>
             <script>
               $(document).ready(function (){
                 $('#dot-switcher').click(function (e){

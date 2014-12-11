@@ -54,7 +54,10 @@ def create_app():
         app.register_blueprint(import_string(import_name))
 
     @app.before_request
-    def get_dot_env():
+    def init_global_vars():
         g.dot_env = request.cookies.get('dotenv', 'intra')
+
+        collected_apps = request.cookies.get('collected_apps', None)
+        g.collected_apps = collected_apps and collected_apps.split(',') or []
 
     return app

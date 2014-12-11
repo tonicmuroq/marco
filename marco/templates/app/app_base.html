@@ -1,0 +1,22 @@
+{% extends "/ui.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main_right %}
+  <div class="row">
+    <ol class="breadcrumb">
+        <li><a href="{{url_for('app.app_set_info', name=app.name)}}"><i class="fa fa-file-text-o"></i>  All Versions</a></li>
+        <li><a href="{{url_for('app.job_history', name=app.name)}}"><i class="fa fa-history"></i>  Job History</a></li>
+        <li><a href="{{url_for('app.metrics', name=app.name)}}"><i class="fa fa-area-chart"></i>  Metrics</a></li>
+        <li><a href="#"><i class="fa fa-cubes"></i>  Containers</a></li>
+        <li><a href="{{url_for('app.settings', name=app.name)}}"><i class="fa fa-gear"></i>  Settings</a></li>
+    </ol>
+  </div>
+  <div class="row">
+    {% block content %}{% endblock %}
+  </div>
+{% endblock %}
+
+{% block bottom_script %}
+  <script type="text/javascript" src="/marco/static/js/app.js"></script>
+  <script type="text/javascript" src="/marco/static/js/charts.js"></script>
+{% endblock %}

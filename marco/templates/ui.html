@@ -1,0 +1,15 @@
+{% extends "/base.html" %}
+
+{% block main_left %}
+  <div class="list-group">
+    <a class="list-group-item" href="{{url_for('index.index')}}"><i class="fa fa-dashboard"></i>  Dashboard</a>
+    <a class="list-group-item" href="#"><i class="fa fa-sitemap"></i>  Hosts</a>
+  </div>
+  <div class="list-group">
+    {% for name in g.collected_apps %}
+      <a class="list-group-item" href="{{url_for('app.app_set_info', name=name)}}"><i class="fa fa-star"></i>  {{name}}</a>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{# vim :set ft=jinja:#}
