@@ -1,16 +1,8 @@
-{% extends "/base.html" %}
+{% extends "/ui.html" %}
 {% import "/utils.html" as utils %}
 
 {% block title %}
   Marco Startup
-{% endblock %}
-
-{% block main_left %}
-  <div class="list-group">
-    <a class="list-group-item" data-toggle="modal" data-target="#import" href="#">导入已有项目</a>
-    <a class="list-group-item" data-toggle="modal" data-target="#create" href="#">创建新项目</a>
-    <a class="list-group-item" href="{{url_for('app.index')}}">看看已有项目</a>
-  </div>
 {% endblock %}
 
 {% block main_right %}

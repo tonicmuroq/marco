@@ -1,0 +1,22 @@
+{% extends "/app/app_base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block content %}
+  {% if tasks %}
+    <div class="list-group">
+      <div class="list-group-item list-group-item-info">最近的活动列表</div>
+      {% for task in tasks %}
+        <a class="list-group-item" href="{{url_for('task.task', task_id=task.id)}}">
+          <span class="label label-info">{{task.repr()}}</span>
+          {% if task.success() %}
+            <span class="label label-success">成功</span>
+          {% elif task.processing() %}
+            <span class="label label-warning">正在执行...</span>
+          {% else %}
+            <span class="label label-warning">失败</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

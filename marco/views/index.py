@@ -3,6 +3,7 @@
 from flask import g, redirect, Blueprint, render_template
 
 from marco.ext import openid2, gitlab
+from marco.models.application import Application
 
 
 bp = Blueprint('index', __name__)
@@ -12,5 +13,8 @@ bp = Blueprint('index', __name__)
 def index():
     if not g.user:
         return redirect(openid2.login_url)
-    namespaces = gitlab.getgroups() or []
-    return render_template('/index.html', namespaces=namespaces)
+    app_names = Application.get_all_app_names(limit=20)
+    # namespaces = gitlab.getgroups() or []
+    # return render_template('/index.html', namespaces=namespaces)
+    # return render_template('/app/app_base.html', namespaces=namespaces)
+    return render_template('dashboard.html', app_names=app_names)

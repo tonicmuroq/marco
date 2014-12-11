@@ -1,13 +1,9 @@
-{% extends "/base.html" %}
+{% extends "/app/app_base.html" %}
 {% import "/utils.html" as utils %}
 
-{% block title %}
-  Marco Applications
-{% endblock %}
-
-{% block main_right %}
-  {% call utils.panel_div('info', 'Gitlab Hook 设置') %}
-    <form class="form-horizontal" role="form" action="{{url_for('app.settings', appname=appname)}}" method="post">
+{% block content %}
+  {% call utils.panel_div('default', 'Gitlab Hook 设置') %}
+    <form class="form-horizontal" role="form" action="{{url_for('app.settings', name=app.name)}}" method="post">
       <div class="form-group">
         <label class="col-sm-2 control-label">Hook Branch</label>
         <div class="col-sm-10">
@@ -21,7 +17,7 @@
       </div>
     </form>
   {% endcall %}
-  {% call utils.panel_div('info', 'NBE 存储资源设置') %}
+  {% call utils.panel_div('default', 'NBE 存储资源设置') %}
     {{resource(config, '存储资源')}}
   {% endcall %}
 {% endblock %}
@@ -55,7 +51,7 @@
   <button class="btn btn-info" data-toggle="modal" data-target="#resource">增加资源实例</button>
 
   {% call utils.modal('resource', '增加一个资源实例', '增加', '取消', 'btn-add-res', True) %}
-    <form class="form-horizontal" role="form" action="{{url_for('app.add_resource', appname=appname)}}" method="post">
+    <form class="form-horizontal" role="form" action="{{url_for('app.add_resource', name=app.name)}}" method="post">
       <div class="form-group">
         <label class="col-sm-2 control-label">名字</label>
         <div class="col-sm-10">

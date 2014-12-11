@@ -77,7 +77,7 @@ class Application(Base):
         try:
             if metric not in METRICS:
                 raise ValueError('Unexpected metric')
-            sql = ("select mean(value) from %s where "
+            sql = ("select mean(value) from \"%s\" where "
                    "metric='%s' group by time(%ds) limit %d" %
                    (self.name, metric, time, limit))
             return influxdb.query(sql)[0]

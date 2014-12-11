@@ -1,0 +1,6 @@
+{% extends "/app/app_base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block content %}
+  {{utils.app_list(apps, "所有版本")}}
+{% endblock %}
