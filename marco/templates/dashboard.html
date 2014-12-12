@@ -1,6 +1,14 @@
 {% extends "/ui.html" %}
 {% import "/utils.html" as utils %}
 
+{% block main_left %}
+  {{super()}}
+  <div class="list-group">
+    <a class="list-group-item" data-toggle="modal" data-target="#import" href="#"><i class="fa fa-git">  Import App</i></a>
+    <a class="list-group-item" data-toggle="modal" data-target="#create" href="#"><i class="fa fa-circle-o-notch">  Create App</i></a>
+  </div>
+{% endblock %}
+
 {% block main_right %}
   <div class="list-group">
     <li class="list-group-item list-group-item-info">应用列表</li>
@@ -30,4 +38,79 @@
       });
     </script>
   </div>
+
+  {% call utils.modal('create', '创建新项目', '提交', '取消', 'btn-create-app', sync=False) %}
+    <form class="form-horizontal" role="form">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">应用名字</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" name="name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">运行环境</label>
+        <div class="col-sm-10">
+          <select id="" class="form-control" name="runtime">
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="php">PHP</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">名字空间</label>
+        <div class="col-sm-10">
+          <select id="" class="form-control" name="namespace">
+            <option value="">{{g.user.username}}</option>
+            {% for ns in namespaces %}
+              <option value="{{ns['id']}}">{{ns['name']}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10 error-display">
+        </div>
+      </div>
+    </form>
+  {% endcall %}
+  {% call utils.modal('import', '导入已有项目', '提交', '取消', 'btn-import-app', sync=False) %}
+    <form class="form-horizontal" role="form">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Gitlab地址</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" name="addr">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">运行环境</label>
+        <div class="col-sm-10">
+          <select id="" class="form-control" name="runtime">
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="php">PHP</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="appyaml">
+              帮我创建一个app.yaml (需要你的仓库已经有分支了, 空仓库创建会失败)
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10 error-display">
+        </div>
+      </div>
+    </form>
+  {% endcall %}
+
+{% endblock %}
+
+{% block bottom_script %}
+  <script type="text/javascript" src="/marco/static/js/manage.js"></script>
 {% endblock %}

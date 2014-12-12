@@ -81,7 +81,7 @@ def add_resource(name):
     name = request.form.get('name', type=str)
     env = request.form.get('env', type=str)
     dot.add_resource(app.name, resource, name, env)
-    return redirect(url_for('app.settings', app=app))
+    return redirect(url_for('app.settings', name=app.name))
 
 
 @bp.route('/<name>/<version>/')
