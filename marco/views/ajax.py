@@ -5,7 +5,7 @@ from flask import Blueprint, request, g
 from marco.ext import dot, gitlab
 from marco.models.host import Host
 from marco.models.container import Container
-from marco.models.application import Application, AppVersion
+from marco.models.application import AppVersion
 
 from marco.views.utils import jsonify
 
@@ -74,6 +74,7 @@ def app_build_image(app_id):
         'python': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:python-2014.11.28',
         'java': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:java-2014.11.28',
         'nodejs': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:nodejs-2014.12.1',
+        'php': 'docker-registry.intra.hunantv.com/nbeimage/ubuntu:php-2014.12.15',
     }
     base = request.form['base']
     host = Host.get(request.form['host_id'])
