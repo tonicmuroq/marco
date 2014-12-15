@@ -20,8 +20,7 @@ def _get_appversion(name, version):
 
 @bp.route('/')
 def index():
-    app_names = Application.get_all_app_names(limit=20)
-    return render_template('/app/index.html', app_names=app_names)
+    return redirect(url_for('index.index'))
 
 
 @bp.route('/<name>/jobs')
