@@ -2,32 +2,27 @@
 
 from werkzeug import cached_property
 
-from marco.ext import db
-from .base import Base
+from marco.ext import dot
 
 
-class Host(Base):
+class Host(object):
 
-    __tablename__ = 'host'
-
-    ip = db.Column(db.String(255), nullable=False)
-    name = db.Column(db.String(255))
-    status = db.Column(db.Integer)
-
-    @classmethod
-    def get_by_ip(cls, ip):
-        return db.session.query(cls).filter(cls.ip == ip).one()
+    def __init__(self, id, ip, name, status):
+        self.id = id
+        self.ip = ip
+        self.name = name
+        self.status = status
 
     @classmethod
     def get(cls, id):
-        return db.session.query(cls).filter(cls.id == id).one()
+        host = dot.get_host_by_id(id)
+        if host:
+            return cls(**host)
 
     @classmethod
     def all_hosts(cls, start=0, limit=20):
-        q = db.session.query(cls).order_by(cls.id).offset(start)
-        if limit is not None:
-            q = q.limit(limit)
-        return q.all()
+        hosts = dot.get_all_hosts(start, limit)
+        return [cls(**host) for host in hosts if host]
 
     def is_online(self):
         return self.status == 0

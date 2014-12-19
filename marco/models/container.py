@@ -2,42 +2,37 @@
 
 from werkzeug import cached_property
 
-from marco.ext import db
-from .base import Base
+from marco.ext import dot
 
 
-class Container(Base):
+class Container(object):
 
-    __tablename__ = 'container'
-
-    container_id = db.Column(db.String(255), nullable=False)
-    port = db.Column(db.Integer, default=0)
-    host_id = db.Column(db.Integer, default=0)
-    ident_id = db.Column(db.String(255), nullable=False)
-    app_name = db.Column(db.String(255), nullable=False)
-    version = db.Column(db.String(255), nullable=False)
+    def __init__(self, id, container_id, port, host_id, ident_id, app_name, version):
+        self.id = id
+        self.container_id = container_id
+        self.port = port
+        self.host_id = host_id
+        self.ident_id = ident_id
+        self.app_name = app_name
+        self.version = version
 
     @classmethod
     def get_by_container_id(cls, cid):
-        # this is important...
         if not cid:
             return None
-        return db.session.query(cls).filter(cls.container_id.like('%s%%' % cid)).first()
+        c = dot.get_container(cid)
+        if c:
+            return cls(**c)
 
     @classmethod
-    def get_multi(cls, host_id=None, app_name=None, version=None):
-        q = db.session.query(cls)
-        if host_id is not None:
-            q = q.filter(cls.host_id == host_id)
-        if app_name is not None:
-            q = q.filter(cls.app_name == app_name)
-        if version is not None:
-            q = q.filter(cls.version == version)
-        return q.order_by(cls.app_name.asc()).all()
+    def get_multi(cls, host_id=-1, app_name='', version='', start=0, limit=20):
+        cs = dot.get_containers(host_id, app_name, version, start, limit)
+        return [cls(**c) for c in cs if c]
 
     @classmethod
-    def get_multi_by_app_name(cls, app_name):
-        return db.session.query(cls).filter(cls.app_name == app_name).all()
+    def get_multi_by_app_name(cls, app_name, start=0, limit=20):
+        cs = dot.get_containers(cls, name=app_name, start=start, limit=limit)
+        return [cls(**c) for c in cs if c]
 
     @cached_property
     def application(self):

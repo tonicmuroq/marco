@@ -1,11 +1,10 @@
 # coding: utf-8
 
+import arrow
 from werkzeug import cached_property
 
-from marco.ext import db, es
-
+from marco.ext import dot, es
 from marco.models.consts import TaskType, TaskStatus, TaskResult
-from marco.models.base import Base
 
 
 repr_dict = {
@@ -24,36 +23,30 @@ apptype_dict = {
 }
 
 
-class Job(Base):
+class Job(object):
 
-    __tablename__ = 'job'
-
-    app_name = db.Column(db.String(255))
-    app_version = db.Column(db.String(255))
-    status = db.Column(db.Integer, nullable=False)
-    succ = db.Column(db.Integer, nullable=False)
-    kind = db.Column(db.Integer, nullable=False)
-    result = db.Column(db.String(255))
-    created = db.Column(db.DateTime)
-    finished = db.Column(db.DateTime)
+    def __init__(self, id, app_name, app_version, status, succ,
+            kind, result, created, finished):
+        self.id = id
+        self.app_name = app_name
+        self.app_version = app_version
+        self.status = status
+        self.succ = succ
+        self.kind = kind
+        self.result = result
+        self.created = arrow.get(created).datetime
+        self.finished = finished and arrow.get(finished).datetime or None
 
     @classmethod
     def get(cls, id):
-        return db.session.query(cls).filter(cls.id == id).one()
+        job = dot.get_job(id)
+        if job:
+            return cls(**job)
 
     @classmethod
-    def get_multi(cls, app_name, app_version=None, status=None, succ=None, start=0, limit=20):
-        q = db.session.query(cls).filter(cls.app_name == app_name)        
-        if app_version is not None:
-            q = q.filter(cls.app_version == app_version)
-        if status is not None:
-            q = q.filter(cls.status == status.value)
-        if succ is not None:
-            q = q.filter(cls.succ == succ.value)
-        q = q.order_by(cls.id.desc()).offset(start)
-        if limit is not None:
-            q = q.limit(limit)
-        return q.all()
+    def get_multi(cls, app_name, app_version='', status=-1, succ=-1, start=0, limit=20):
+        jobs = dot.get_jobs(app_name, app_version, status, succ, start, limit)
+        return [cls(**job) for job in jobs]
 
     def success(self):
         return TaskResult(self.succ) == TaskResult.Succ

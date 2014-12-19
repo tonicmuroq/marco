@@ -2,7 +2,6 @@
 
 import os
 
-from flask.ext.sqlalchemy import SQLAlchemy
 from .openid2_ext import OpenID2
 from .etcd_ext import Etcd
 from .elasticsearch_ext import ElasticSearch
@@ -11,7 +10,6 @@ from .dot_ext import Dot
 from .gitlab_ext import Gitlab
 
 
-db = SQLAlchemy()
 etcd = Etcd()
 es = ElasticSearch()
 influxdb = InfluxDB()
