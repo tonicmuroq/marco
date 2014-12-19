@@ -2,12 +2,12 @@
 
 import json
 import logging
+import arrow
 from urllib2 import quote
 from werkzeug import cached_property
 
-from marco.ext import db, etcd, influxdb
+from marco.ext import dot, etcd, influxdb
 from marco.models.consts import TaskStatus
-from marco.models.base import Base
 
 from marco.utils import yaml_loads
 
@@ -19,27 +19,26 @@ METRICS = {
 }
 
 
-class Application(Base):
+class Application(object):
 
-    __tablename__ = 'application'
-
-    name = db.Column(db.String(255), nullable=False)
-    pname = db.Column(db.String(255), nullable=False)
-    namespace = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    def __init__(self, id, name, pname, namespace):
+        self.id = id
+        self.name = name
+        self.pname = pname
+        self.namespace = namespace
 
     @classmethod
     def get_by_name(cls, name):
         u"""获取确定的一个app, 如果有多个就挂"""
-        return db.session.query(cls).filter(cls.name == name).one()
+        app = dot.get_app(name)
+        if app:
+            return cls(**app)
 
     @classmethod
     def get_all_app_names(cls, start=0, limit=20):
         u"""取所有的应用名字, 从start开始取limit个"""
-        q = db.session.query(cls.name).order_by(cls.name.asc()).offset(start)
-        if limit is not None:
-            q = q.limit(limit)
-        return [r for r, in q.all()]
+        apps = dot.get_apps(start, limit)
+        return [a['name'] for a in apps]
 
     def mysql_args_dict(self):
         key = '/NBE/{self.name}/mysql'.format(self=self)
@@ -54,12 +53,12 @@ class Application(Base):
     def all_versions(self):
         return AppVersion.get_multi(self.name)
 
-    def tasks(self, status=None, succ=None, start=0, limit=20):
+    def tasks(self, status=-1, succ=-1, start=0, limit=20):
         from .task import Job 
         return Job.get_multi(self.name, status=status, succ=succ, start=start, limit=limit)
 
     def processing_tasks(self, start=0, limit=20):
-        return self.tasks(status=TaskStatus.Running, start=start, limit=limit)
+        return self.tasks(status=TaskStatus.Running.value, start=start, limit=limit)
 
     def processing(self):
         return len(self.processing_tasks(limit=1)) > 0
@@ -85,42 +84,44 @@ class Application(Base):
             logging.exception(e)
             return {'data': [], 'name': ''}
 
-class AppVersion(Base):
+class AppVersion(object):
 
-    __tablename__ = 'app_version'
+    def __init__(self, id, name, version, created, image_addr, app_yaml):
+        self.id = id
+        self.name = name
+        self.version = version
+        self.created = arrow.get(created).datetime
+        self.image_addr = image_addr
+        self.app_yaml = app_yaml
 
-    name = db.Column(db.String(255), nullable=False)
-    version = db.Column(db.String(255), nullable=False)
-    created = db.Column(db.DateTime)
-    image_addr = db.Column(db.String(255), nullable=False)
+    @classmethod
+    def _init(cls, **kw):
+        kw['app_yaml'] = kw.pop('app.yaml')
+        return cls(**kw)
 
     @classmethod
     def get(cls, id):
-        return db.session.query(cls).filter(cls.id == id).one()
+        av = dot.get_appversion_by_id(id)
+        if av:
+            return cls._init(**av)
 
     @classmethod
     def get_by_name_and_version(cls, name, version):
-        return db.session.query(cls).filter(cls.name == name, cls.version == version).one()
+        av = dot.get_appversion(name, version)
+        if av:
+            return cls._init(**av)
 
     @classmethod
-    def get_multi(cls, name):
-        return db.session.query(cls).filter(cls.name == name).order_by(cls.created.desc()).all()
+    def get_multi(cls, name, start=0, limit=20):
+        avs = dot.get_app_versions(name, start=start, limit=limit)
+        return [cls._init(**av) for av in avs if av]
 
-    @cached_property
-    def app_yaml(self):
-        try:
-            r = etcd.get('/NBE/{self.name}/{self.version}/app.yaml'.format(self=self))
-            app_yaml = r.value if (r and not r.dir) else '{}'
-        except KeyError:
-            app_yaml = '{}'
-        return yaml_loads(app_yaml)
-
-    def tasks(self, status=None, succ=None, start=0, limit=20):
+    def tasks(self, status=-1, succ=-1, start=0, limit=20):
         from .task import Job 
         return Job.get_multi(self.name, self.version, status=status, succ=succ, start=start, limit=limit)
 
     def processing_tasks(self, start=0, limit=20):
-        return self.tasks(status=TaskStatus.Running, start=start, limit=limit)
+        return self.tasks(status=TaskStatus.Running.value, start=start, limit=limit)
 
     def processing(self):
         return len(self.processing_tasks(limit=1)) > 0

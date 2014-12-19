@@ -2,7 +2,7 @@ appname: "marco"
 port: 5000
 runtime: "python"
 build:
-    - "apt-get install -y libssl-dev libffi-dev && pip install -r ./requirements.txt"
+    - "pip install -r ./requirements.txt"
 cmd:
     - "python app.py"
 static: "marco/static"

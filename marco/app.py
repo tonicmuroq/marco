@@ -7,7 +7,7 @@ import logging
 from flask import Flask, request, g
 from werkzeug.utils import import_string
 
-from marco.ext import db, etcd, es, influxdb, openid2, dot, gitlab
+from marco.ext import etcd, es, influxdb, openid2, dot, gitlab
 from marco.views.navigator import init_nav
 
 blueprints = (
@@ -40,7 +40,6 @@ def create_app():
     logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
                         level=logging.INFO)
 
-    db.init_app(app)
     etcd.init_app(app)
     es.init_app(app)
     influxdb.init_app(app)

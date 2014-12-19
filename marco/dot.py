@@ -36,9 +36,17 @@ class DotClient(object):
             return self._username
         raise RuntimeError('need username set')
 
-    def request(self, url, method='GET', params=None, data=None, json=True, expected_code=200, need_user=True):
-        username = self._get_username() if need_user else 'NBEBot'
-        headers = {'NBE-user': username}
+    def request(self, url, method='GET', params={}, data=None, json=True, expected_code=200, need_user=True):
+        if method == 'GET':
+            need_user = False
+        # set user
+        headers = {'NBE-user': self._get_username() if need_user else 'NBEBot'}
+
+        # set start/limit if none
+        if 'start' not in params:
+            params['start'] = 0
+        if 'limit' not in params:
+            params['limit'] = 20
 
         target_url = urljoin(self._base_url, url)
         resp = session.request(method=method, url=target_url, params=params,
@@ -99,5 +107,110 @@ class DotClient(object):
 
     def get_hook_branch(self, app_name):
         url = '/app/%s/branch' % app_name
-        r = self.request(url, method='GET', need_user=False)
+        r = self.request(url)
         return r['branch'] if not r['r'] else 'master'
+
+    def get_app(self, app_name):
+        url = '/app/%s' % app_name
+        return self.request(url)
+
+    def get_apps(self, start=0, limit=20):
+        params = {
+            'start': start,
+            'limit': limit,
+        }
+        return self.request('/app', params=params)
+
+    def get_app_jobs(self, app_name, status=-1, succ=-1, start=0, limit=20):
+        url = '/app/%s/jobs' % app_name
+        params = {
+            'status': status,
+            'succ': succ,
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_app_containers(self, app_name, start=0, limit=20):
+        url = '/app/%s/containers' % app_name
+        params = {
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_app_versions(self, app_name, start=0, limit=20):
+        url = '/app/%s/versions' % app_name
+        params = {
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_appversion(self, name, version):
+        url = '/appversion/%s/%s' % (name, version)
+        return self.request(url)
+
+    def get_appversion_by_id(self, id):
+        url = '/appversion/%s' % id
+        return self.request(url)
+
+    def get_appversion_jobs(self, name, version, status=-1, succ=-1, start=0, limit=20):
+        url = '/appversion/%s/%s/jobs' % (name, version)
+        params = {
+            'status': status,
+            'succ': succ,
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_appversion_containers(self, name, version, start=0, limit=20):
+        url = '/appversion/%s/%s/containers' % (name, version)
+        params = {
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_host_by_id(self, id):
+        url = '/host/%s' % id
+        return self.request(url)
+
+    def get_all_hosts(self, start=0, limit=20):
+        url = '/hosts'
+        params = {
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_container(self, cid):
+        url = '/container/%s' % cid
+        return self.request(url)
+
+    def get_containers(self, host_id=-1, name='', version='', start=0, limit=20):
+        url = '/containers'
+        params = {
+            'host_id': host_id,
+            'name': name,
+            'version': version,
+            'start': start,
+            'limit': limit,
+        }
+        return self.request(url, params=params)
+
+    def get_job(self, id):
+        url = '/job/%s' % id
+        return self.request(url)
+
+    def get_jobs(self, name, version='', status=-1, succ=-1, start=0, limit=20):
+        params = {
+            'name': name,
+            'version': version,
+            'status': status,
+            'succ': succ,
+            'start': start,
+            'limit': limit,
+        }
+        return self.request('/jobs', params=params)
