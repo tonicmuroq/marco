@@ -103,7 +103,7 @@ class DotClient(object):
     def set_hook_branch(self, app_name, branch):
         url = '/app/%s/branch' % app_name
         data = {'branch': branch}
-        return self.request(url, method='POST', data=data)
+        return self.request(url, method='PUT', data=data)
 
     def get_hook_branch(self, app_name):
         url = '/app/%s/branch' % app_name
