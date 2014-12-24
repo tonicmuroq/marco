@@ -110,6 +110,11 @@ class DotClient(object):
         r = self.request(url)
         return r['branch'] if not r['r'] else 'master'
 
+    def get_sentry_dsn(self, app_name, platform):
+        url = '/resource/%s/sentry' % app_name
+        data = {'platform': platform}
+        return self.request(url, method='POST', data=data)
+
     def get_app(self, app_name):
         url = '/app/%s' % app_name
         return self.request(url)
