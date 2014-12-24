@@ -37,7 +37,7 @@ def load_config(name):
 
 def create_app():
     config = load_config('config.yaml')
-    mysql_dsn = 'mysql://{user}:{password}@{host}:{port}/{db}'.format(**config['mysql'])
+    mysql_dsn = 'mysql://{username}:{password}@{host}:{port}/{db}'.format(**config['mysql'])
 
     app = Flask(__name__, static_url_path='/marco/static')
     app.config.update(load_config('env.yaml'))
