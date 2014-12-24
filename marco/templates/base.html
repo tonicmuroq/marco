@@ -30,13 +30,24 @@
             <p class="navbar-text">On marco @ version</p>
           </div>
           <div class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle switcher" data-toggle="dropdown">{{g.pod_name}} <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                {% for pod in g.user.pods if pod.dot_url %}
+                  <li><a href="" class="pod-switcher" data-name="{{pod.name}}">{{pod.name}}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            {#
             <li><a href="" id="dot-switcher">{{g.dot_env}}</a></li>
+            #}
             <script>
               $(document).ready(function (){
-                $('#dot-switcher').click(function (e){
+                $('.pod-switcher').click(function (e){
+                  var name = $(this).data('name');
                   e.preventDefault();
-                  $.post('{{url_for("env.set_dot_env")}}', {}, function (r){
-                    $('#dot-switcher').html(r.env);
+                  $.post('{{url_for("env.set_pod_name")}}', {name: name}, function (r){
+                    $('.dropdown-toggle.switcher').html(r.env+' <b class="caret"></b>');
                   });
                 });
               });

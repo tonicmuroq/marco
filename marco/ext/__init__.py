@@ -22,5 +22,5 @@ gitlab = Gitlab()
 __all__ = [
     'db', 'etcd', 'es', 'influxdb', 'openid2', 'dot', 'gitlab',
     'SQLAlchemy', 'Etcd', 'ElasticSearch',
-    'InfluxDB', 'OpenID2', 'DotClient', 'Gitlab'
+    'InfluxDB', 'OpenID2', 'DotClient', 'Gitlab',
 ]

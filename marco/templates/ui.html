@@ -10,6 +10,12 @@
       <a class="list-group-item" href="{{url_for('app.app_set_info', name=name)}}"><i class="fa fa-star"></i>  {{name}}</a>
     {% endfor %}
   </div>
+  {% if g.user and g.user.is_admin() %}
+    <div class="list-group">
+      <a class="list-group-item" href="{{url_for('pod.privilege_manage')}}"><i class="fa fa-wrench"></i>  Admin</a>
+      <a class="list-group-item" href="{{url_for('pod.all_pods')}}"><i class="fa fa-gears"></i>  Pods</a>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {# vim :set ft=jinja:#}

@@ -1,0 +1,36 @@
+{% extends "/ui.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main_right %}
+  {% call utils.panel_div('default', 'Pod admin 设置') %}
+    <form class="form-horizontal" role="form" action="{{url_for('pod.privilege_manage')}}" method="post">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Email</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" name="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Privilege</label>
+        <div class="col-sm-10">
+          <select id="" class="form-control" name="privilege">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">修改</button>
+        </div>
+      </div>
+    </form>
+  {% endcall %}
+{% endblock %}
+
+{# vim:set ft=jinja: #}
