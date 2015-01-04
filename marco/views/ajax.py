@@ -5,7 +5,7 @@ from flask import Blueprint, request, g
 from marco.ext import dot, gitlab
 from marco.models.host import Host
 from marco.models.container import Container
-from marco.models.application import AppVersion
+from marco.models.application import AppVersion, Application
 
 from marco.views.utils import jsonify
 
@@ -46,11 +46,11 @@ def update_app(name):
     return {'r': 0}
 
 
-@bp.route('/app/<app_id>/all_metrics')
+@bp.route('/app/<appname>/all_metrics')
 @jsonify
-def app_all_metric(app_id):
-    app = _get_app(app_id)
-    data = app.application.all_realtime_metric_data(
+def app_all_metric(appname):
+    app = Application.get_by_name(appname)
+    data = app.all_realtime_metric_data(
         request.args.get('time', type=int, default=10), request.args.get('limit', type=int, default=100))
     return {k: v.get('points', []) for k, v in data.iteritems()}
 

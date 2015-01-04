@@ -54,6 +54,27 @@ class Pod(Base):
         return dots[0].url
 
     @cached_property
+    def etcd(self):
+        dots = self.dots
+        if not dots:
+            return ''
+        return dots[0].etcd
+
+    @cached_property
+    def es(self):
+        dots = self.dots
+        if not dots:
+            return ''
+        return dots[0].es
+
+    @cached_property
+    def influxdb(self):
+        dots = self.dots
+        if not dots:
+            return ''
+        return dots[0].influxdb
+
+    @cached_property
     def dot_ws_url(self):
         dots = self.dots
         if not dots:
@@ -116,11 +137,14 @@ class Dot(Base):
     __tablename__ = 'dot'
 
     url = db.Column(db.String(255), nullable=False)
+    es = db.Column(db.String(255), nullable=False)
+    etcd = db.Column(db.String(255), nullable=False)
+    influxdb = db.Column(db.String(255), nullable=False)
     pod_id = db.Column(db.Integer, nullable=False, default=0, index=True)
 
     @classmethod
-    def create(cls, url, pod_id=0):
-        d = cls(url=url, pod_id=pod_id)
+    def create(cls, url, pod_id=0, es='', etcd='', influxdb=''):
+        d = cls(url=url, pod_id=pod_id, es=es, etcd=etcd, influxdb=influxdb)
         db.session.add(d)
         db.session.commit()
 

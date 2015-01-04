@@ -2,30 +2,22 @@
 
 from urlparse import urlparse
 from elasticsearch import Elasticsearch
-from flask import current_app, _app_ctx_stack
+from flask import _app_ctx_stack, g 
 
 class ElasticSearch(object):
 
-    def __init__(self, app=None):
-        self.app = app
-        if app is not None:
-            self.init_app(app)
-
-    def init_app(self, app):
-        app.config.setdefault('ES_URI', 'http://localhost:9200')
-
-    def connect(self):
-        es_uri = current_app.config['ES_URI']
-        parsed = urlparse(es_uri)
+    def connect(self, url):
+        parsed = urlparse(url)
         return Elasticsearch(host=parsed.hostname, port=parsed.port)
 
-    @property
-    def es(self):
+    def es(self, pod):
         ctx = _app_ctx_stack.top
         if ctx is not None:
-            if not hasattr(ctx, 'es'):
-                ctx.es = self.connect()
-            return ctx.es
+            name = 'es_%s' % pod.name
+            if not hasattr(ctx, name):
+                setattr(ctx, name, self.connect(pod.es))
+            return getattr(ctx, name)
 
     def __getattr__(self, name):
-        return getattr(self.es, name)
+        es = self.es(g.pod)
+        return getattr(es, name)

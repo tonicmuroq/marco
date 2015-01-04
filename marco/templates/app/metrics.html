@@ -71,9 +71,10 @@
                 }
 
                 $.ajax({
-                    url: '/ajax/app/{{ app.id }}/all_metrics?version={{ app.version|e }}&limit=' + limit,
+                    url: '/ajax/app/{{ app.name }}/all_metrics?version={{ app.version|e }}&limit=' + limit,
                     type: 'GET',
                     success: function(r) {
+                        console.log(r);
                         if (initChart) {
                             $('#app-stat').slideToggle('fast');
                         }
