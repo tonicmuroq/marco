@@ -2,32 +2,24 @@
 
 from urlparse import urlparse
 from influxdb import InfluxDBClient
-from flask import current_app, _app_ctx_stack
+from flask import _app_ctx_stack, g
 
 class InfluxDB(object):
 
-    def __init__(self, app=None):
-        self.app = app
-        if app is not None:
-            self.init_app(app)
-
-    def init_app(self, app):
-        app.config.setdefault('INFLUXDB_URI', 'http://localhost:8086')
-
-    def connect(self):
-        es_uri = current_app.config['INFLUXDB_URI']
-        parsed = urlparse(es_uri)
+    def connect(self, url):
+        parsed = urlparse(url)
         return InfluxDBClient(host=parsed.hostname, port=parsed.port,
                 username=parsed.username, password=parsed.password,
                 database=parsed.path[1:])
 
-    @property
-    def influxdb(self):
+    def influxdb(self, pod):
         ctx = _app_ctx_stack.top
         if ctx is not None:
-            if not hasattr(ctx, 'influxdb'):
-                ctx.influxdb = self.connect()
-            return ctx.influxdb
+            name = 'influxdb_%s' % pod.name
+            if not hasattr(ctx, name):
+                setattr(ctx, name, self.connect(pod.influxdb))
+            return getattr(ctx, name)
 
     def __getattr__(self, name):
-        return getattr(self.influxdb, name)
+        influxdb = self.influxdb(g.pod)
+        return getattr(influxdb, name)

@@ -2,30 +2,22 @@
 
 import etcd
 from urlparse import urlparse
-from flask import current_app, _app_ctx_stack
+from flask import _app_ctx_stack, g
 
 class Etcd(object):
 
-    def __init__(self, app=None):
-        self.app = app
-        if app is not None:
-            self.init_app(app)
-
-    def init_app(self, app):
-        app.config.setdefault('ETCD_URI', 'http://localhost:4001')
-
-    def connect(self):
-        etcd_uri = current_app.config['ETCD_URI']
-        parsed = urlparse(etcd_uri)
+    def connect(self, url):
+        parsed = urlparse(url)
         return etcd.Client(host=parsed.hostname, port=parsed.port)
 
-    @property
-    def etcd(self):
+    def etcd(self, pod):
         ctx = _app_ctx_stack.top
         if ctx is not None:
-            if not hasattr(ctx, 'etcd'):
-                ctx.etcd = self.connect()
-            return ctx.etcd
+            name = 'etcd_%s' % pod.name
+            if not hasattr(ctx, name):
+                setattr(ctx, name, self.connect(pod.etcd))
+            return getattr(ctx, name)
 
     def __getattr__(self, name):
-        return getattr(self.etcd, name)
+        etcd = self.etcd(g.pod)
+        return getattr(etcd, name)

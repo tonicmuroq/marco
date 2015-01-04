@@ -59,7 +59,7 @@
   <div class="list-group container-list">
     <li class="list-group-item list-group-item-info">容器列表</li>
     {% for container in containers %}
-      <a class="list-group-item" href="{{url_for('container.container', cid=container.container_id)}}">
+      <a class="list-group-item">
         {% if show_check %}
           <div class="container-check">
             <input type="checkbox" class="check-container" data-cid="{{container.container_id}}"></input>

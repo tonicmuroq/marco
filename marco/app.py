@@ -18,7 +18,6 @@ blueprints = (
     'host',
     'hook',
     'task',
-    'container',
     'application',
     'manage',
     'pod',
@@ -52,7 +51,7 @@ def create_app():
     logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
                         level=logging.INFO)
 
-    for ext in (db, etcd, es, influxdb, openid2, dot, gitlab):
+    for ext in (db, openid2, gitlab):
         ext.init_app(app)
 
     for ft in template_filters:

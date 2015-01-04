@@ -50,8 +50,11 @@ def pod_dot(pod_id):
         abort(404)
     if request.method == 'POST':
         dot_url = request.form.get('dot', type=str, default='')
+        es = request.form.get('es', type=str, default='')
+        etcd = request.form.get('etcd', type=str, default='')
+        influxdb = request.form.get('influxdb', type=str, default='')
         if dot_url:
-            Dot.create(dot_url, pod_id)
+            Dot.create(dot_url, pod_id, es, etcd, influxdb)
     return render_template('/pod/pod_dot.html', pod=pod)
 
 
