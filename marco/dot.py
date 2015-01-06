@@ -105,6 +105,10 @@ class DotClient(object):
         data = {'platform': platform}
         return self.request(url, method='POST', data=data)
 
+    def add_influxdb(self, app_name):
+        url = '/resource/%s/influxdb' % app_name
+        return self.request(url, method='POST')
+
     def set_hook_branch(self, app_name, branch):
         url = '/app/%s/branch' % app_name
         data = {'branch': branch}

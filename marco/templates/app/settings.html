@@ -16,6 +16,34 @@
       </form>
     {% endif %}
   {% endcall %}
+  {% call utils.panel_div('default', 'InfluxDB') %}
+    {% if influxdb %}
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Host</th>
+            <th>Port</th>
+            <th>DB</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>InfluxDB</td>
+            <td>{{influxdb['host']}}</td>
+            <td>{{influxdb['port']}}</td>
+            <td>{{influxdb['db']}}</td>
+          </tr>
+        </tbody>
+      </table>
+    {% else %}
+      <p>你还没有配置influxdb</p>
+      <form action="{{url_for('app.add_influxdb', name=app.name)}}" method="post">
+        <input type="hidden" name="name" value="{{app.name}}">
+        <button class="btn btn-info" type="submit">增加InfluxDB</button>
+      </form>
+    {% endif %}
+  {% endcall %}
 {% endblock %}
 
 {% macro resource(rs, name) %}

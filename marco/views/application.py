@@ -66,8 +66,9 @@ def settings(name):
     config = get_config_yaml(app.name, 'prod')
     storage = {k: config.get(k, None) for k in ('mysql', 'redis')}
     sentry = config.get('sentry_dsn', '')
+    influxdb = config.get('influxdb', {})
     return render_template('/app/settings.html', config=config,
-            storage=storage, sentry=sentry, app=app)
+            storage=storage, sentry=sentry, influxdb=influxdb, app=app)
 
 
 @bp.route('/<name>/settings/resources', methods=['POST'])
@@ -86,6 +87,12 @@ def add_sentry(name):
     av = app.all_versions()[0]
     dot.add_sentry(name, av.runtime)
     return redirect(url_for('app.settings', name=app.name))
+
+
+@bp.route('/<name>/settings/influxdb', methods=['POST'])
+def add_influxdb(name):
+    dot.add_influxdb(name)
+    return redirect(url_for('app.settings', name=name))
 
 
 @bp.route('/<name>/<version>/')
