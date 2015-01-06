@@ -5,10 +5,12 @@ import yaml
 import json
 import logging
 
+from raven.contrib.flask import Sentry
+
 from flask import Flask, request, g
 from werkzeug.utils import import_string
 
-from marco.ext import db, etcd, es, influxdb, openid2, dot, gitlab
+from marco.ext import db, openid2, gitlab
 from marco.models.pod import Pod, User
 
 blueprints = (
@@ -27,6 +29,8 @@ template_filters = (
     enumerate,
 )
 
+DEV_MODE = os.getenv('NBE_RUNENV', 'DEV') == 'DEV'
+
 
 def load_config(name):
     config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), name)
@@ -37,6 +41,7 @@ def load_config(name):
 def create_app():
     config = load_config('config.yaml')
     mysql_dsn = 'mysql://{username}:{password}@{host}:{port}/{db}'.format(**config['mysql'])
+    sentry_dsn = config['sentry_dsn']
 
     app = Flask(__name__, static_url_path='/marco/static')
     app.config.update(load_config('env.yaml'))
@@ -50,6 +55,10 @@ def create_app():
 
     logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
                         level=logging.INFO)
+
+    sentry = Sentry(dsn=sentry_dsn)
+    if not DEV_MODE:
+        sentry.init_app(app)
 
     for ext in (db, openid2, gitlab):
         ext.init_app(app)
