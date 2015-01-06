@@ -2,7 +2,7 @@
 
 from flask import g, redirect, Blueprint, render_template
 
-from marco.ext import openid2, gitlab
+from marco.ext import openid2
 from marco.models.application import Application
 
 
@@ -18,3 +18,9 @@ def index():
     # return render_template('/index.html', namespaces=namespaces)
     # return render_template('/app/app_base.html', namespaces=namespaces)
     return render_template('dashboard.html', app_names=app_names)
+
+
+@bp.route('/_sentry')
+def test_sentry():
+    1/0
+    return 'test_sentry'

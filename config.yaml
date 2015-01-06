@@ -4,3 +4,4 @@ mysql:
     username: "root"
     password: ""
     db: "marco"
+sentry_dsn: ''
