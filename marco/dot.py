@@ -100,6 +100,11 @@ class DotClient(object):
         data = {'name': name, 'env': env}
         return self.request(url, method='POST', data=data)
 
+    def add_sentry(self, app_name, platform):
+        url = '/resource/%s/sentry' % app_name
+        data = {'platform': platform}
+        return self.request(url, method='POST', data=data)
+
     def set_hook_branch(self, app_name, branch):
         url = '/app/%s/branch' % app_name
         data = {'branch': branch}
