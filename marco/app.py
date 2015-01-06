@@ -29,6 +29,8 @@ template_filters = (
     enumerate,
 )
 
+DEV_MODE = os.getenv('NBE_RUNENV', 'DEV') == 'DEV'
+
 
 def load_config(name):
     config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), name)
@@ -55,7 +57,10 @@ def create_app():
                         level=logging.INFO)
 
     sentry = Sentry(dsn=sentry_dsn)
-    for ext in (db, openid2, gitlab, sentry):
+    if not DEV_MODE:
+        sentry.init_app(app)
+
+    for ext in (db, openid2, gitlab):
         ext.init_app(app)
 
     for ft in template_filters:
