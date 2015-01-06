@@ -2,23 +2,19 @@
 {% import "/utils.html" as utils %}
 
 {% block content %}
-  {% call utils.panel_div('default', 'Gitlab Hook 设置') %}
-    <form class="form-horizontal" role="form" action="{{url_for('app.settings', name=app.name)}}" method="post">
-      <div class="form-group">
-        <label class="col-sm-2 control-label">Hook Branch</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" name="branch" placeholder="{{hook_branch}}">
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-default">修改</button>
-        </div>
-      </div>
-    </form>
-  {% endcall %}
   {% call utils.panel_div('default', 'NBE 存储资源设置') %}
-    {{resource(config, '存储资源')}}
+    {{resource(storage, '存储资源')}}
+  {% endcall %}
+  {% call utils.panel_div('default', 'Sentry') %}
+    {% if sentry %}
+      {{sentry}}
+    {% else %}
+      <p>你还没有配置sentry</p>
+      <form action="{{url_for('app.add_sentry', name=app.name)}}" method="post">
+        <input type="hidden" name="name" value="{{app.name}}">
+        <button class="btn btn-info" type="submit">增加Sentry</button>
+      </form>
+    {% endif %}
   {% endcall %}
 {% endblock %}
 

@@ -63,14 +63,11 @@ def app_set_info(name):
 @bp.route('/<name>/settings/', methods=['POST', 'GET', ])
 def settings(name):
     app = Application.get_by_name(name)
-    if request.method == 'POST':
-        branch = request.form.get('branch', type=str)
-        dot.set_hook_branch(app.name, branch)
-
-    hook_branch = dot.get_hook_branch(app.name)
     config = get_config_yaml(app.name, 'prod')
-    return render_template('/app/settings.html',
-            hook_branch=hook_branch, config=config, app=app)
+    storage = {k: config.get(k, None) for k in ('mysql', 'redis')}
+    sentry = config.get('sentry_dsn', '')
+    return render_template('/app/settings.html', config=config,
+            storage=storage, sentry=sentry, app=app)
 
 
 @bp.route('/<name>/settings/resources', methods=['POST'])
@@ -80,6 +77,14 @@ def add_resource(name):
     name = request.form.get('name', type=str)
     env = request.form.get('env', type=str)
     dot.add_resource(app.name, resource, name, env)
+    return redirect(url_for('app.settings', name=app.name))
+
+
+@bp.route('/<name>/settings/sentry', methods=['POST'])
+def add_sentry(name):
+    app = Application.get_by_name(name)
+    av = app.all_versions()[0]
+    dot.add_sentry(name, av.runtime)
     return redirect(url_for('app.settings', name=app.name))
 
 
