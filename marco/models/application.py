@@ -159,4 +159,6 @@ def get_config_yaml(app_name, env):
         config = r.value if (r and not r.dir) else '{}'
     except KeyError:
         config = '{}'
+    if not config:
+        config = '{}'
     return yaml_loads(config)
