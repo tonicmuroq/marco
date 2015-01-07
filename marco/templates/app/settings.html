@@ -75,7 +75,7 @@
   <button class="btn btn-info" data-toggle="modal" data-target="#resource">增加资源实例</button>
 
   {% call utils.modal('resource', '增加一个资源实例', '增加', '取消', 'btn-add-res', True) %}
-    <form class="form-horizontal" role="form" action="{{url_for('app.add_resource', name=app.name)}}" method="post">
+    <form id="resource" class="form-horizontal" role="form" action="{{url_for('app.add_resource', name=app.name)}}" method="post">
       <div class="form-group">
         <label class="col-sm-2 control-label">名字</label>
         <div class="col-sm-10">
@@ -104,7 +104,7 @@
     <script>
       $(document).ready(function() {
           $('.btn-add-res').click(function() {
-            $('form').submit();
+            $('form#resource').submit();
           });
       });
     </script>
