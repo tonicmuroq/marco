@@ -114,6 +114,11 @@ class DotClient(object):
         data = {'branch': branch}
         return self.request(url, method='PUT', data=data)
 
+    def syncdb(self, app_name, schema):
+        url = '/resource/%s/syncdb' % app_name
+        data = {'schema': schema}
+        return self.request(url, method='POST', data=data)
+
     def get_hook_branch(self, app_name):
         url = '/app/%s/branch' % app_name
         r = self.request(url)

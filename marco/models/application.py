@@ -126,6 +126,10 @@ class AppVersion(object):
     def processing(self):
         return len(self.processing_tasks(limit=1)) > 0
 
+    @property
+    def gitlab_id(self):
+        return self.application.gitlab_id
+
     @cached_property
     def application(self):
         return Application.get_by_name(self.name)

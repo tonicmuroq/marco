@@ -118,7 +118,7 @@ def app_sync_db(app_id):
     schema = app.app_yaml.get('schema', '')
     if schema:
         sql = gitlab.getrawblob(app.gitlab_id, app.version, schema)
-        return {'r': sql}
+        return dot.syncdb(app.name, sql)
     return {'r': 0}
 
 
