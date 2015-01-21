@@ -13,7 +13,7 @@ bp = Blueprint('index', __name__)
 def index():
     if not g.user:
         return redirect(openid2.login_url)
-    app_names = Application.get_all_app_names(limit=20)
+    app_names = Application.get_all_app_names(limit=200)
     # namespaces = gitlab.getgroups() or []
     # return render_template('/index.html', namespaces=namespaces)
     # return render_template('/app/app_base.html', namespaces=namespaces)
