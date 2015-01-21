@@ -35,7 +35,7 @@ class Application(object):
             return cls(**app)
 
     @classmethod
-    def get_all_app_names(cls, start=0, limit=20):
+    def get_all_app_names(cls, start=0, limit=200):
         u"""取所有的应用名字, 从start开始取limit个"""
         apps = dot.get_apps(start, limit)
         return [a['name'] for a in apps]
