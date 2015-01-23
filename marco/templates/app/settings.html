@@ -44,6 +44,9 @@
       </form>
     {% endif %}
   {% endcall %}
+  {% call utils.panel_div('default', 'Zipkin') %}
+    <input type="checkbox" name="zipkin" data-on-color="info" {{'checked' if zipkin else '' | safe}}>
+  {% endcall %}
 {% endblock %}
 
 {% macro resource(rs, name) %}
@@ -110,5 +113,29 @@
     </script>
   {% endcall %}
 {% endmacro %}
+
+{% block more_header %}
+  <link href="/marco/static/css/bootstrap-switch.min.css" rel="stylesheet">
+  <script src="/marco/static/js/bootstrap-switch.min.js"></script>
+{% endblock %}
+
+{% block bottom_script %}
+  <script>
+    $(document).ready(function() {
+      $('input[name=zipkin]').bootstrapSwitch();
+      $('input[name=zipkin]').on('switchChange.bootstrapSwitch', function(e, s){
+        var zipkin = 'off';
+        if (s) {
+          zipkin = 'on';
+        }
+        $.post('{{url_for('app.use_zipkin', name=app.name)}}', {zipkin: zipkin}, function(r){
+          if (!r) {
+            alert('设置出错');
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}
 
 {# vim:set ft=jinja: #}

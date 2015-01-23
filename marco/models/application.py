@@ -3,6 +3,7 @@
 import json
 import logging
 import arrow
+import yaml
 from urllib2 import quote
 from werkzeug import cached_property
 
@@ -166,3 +167,11 @@ def get_config_yaml(app_name, env):
     if not config:
         config = '{}'
     return yaml_loads(config)
+
+
+def set_config_yaml(app_name, env, config):
+    try:
+        etcd.set('/NBE/%s/resource-%s' % (app_name, env), yaml.safe_dump(config, default_flow_style=False))
+        return True
+    except:
+        return False
