@@ -1,11 +1,11 @@
 # coding: utf-8
 import json
 from flask import (Blueprint, Response, request, render_template,
-        abort, g, redirect, url_for)
+        abort, g, redirect, url_for, jsonify)
 
 from marco.ext import openid2, dot
 from marco.models.host import Host
-from marco.models.application import Application, AppVersion, get_config_yaml
+from marco.models.application import Application, AppVersion, get_config_yaml, set_config_yaml
 
 
 bp = Blueprint('app', __name__, url_prefix='/app')
@@ -67,8 +67,10 @@ def settings(name):
     storage = {k: config.get(k, None) for k in ('mysql', 'redis')}
     sentry = config.get('sentry_dsn', '')
     influxdb = config.get('influxdb', {})
+    zipkin = config.get('zipkin', False)
     return render_template('/app/settings.html', config=config,
-            storage=storage, sentry=sentry, influxdb=influxdb, app=app)
+            storage=storage, sentry=sentry, influxdb=influxdb, zipkin=zipkin,
+            app=app)
 
 
 @bp.route('/<name>/settings/resources', methods=['POST'])
@@ -93,6 +95,15 @@ def add_sentry(name):
 def add_influxdb(name):
     dot.add_influxdb(name)
     return redirect(url_for('app.settings', name=name))
+
+
+@bp.route('/<name>/settings/zipkin', methods=['POST'])
+def use_zipkin(name):
+    config = get_config_yaml(name, 'prod')
+    value = request.form.get('zipkin', 'off')
+    config['zipkin'] = True if value == 'on' else False
+    r = set_config_yaml(name, 'prod', config)
+    return jsonify({'r': r})
 
 
 @bp.route('/<name>/<version>/')
