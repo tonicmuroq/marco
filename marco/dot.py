@@ -58,32 +58,32 @@ class DotClient(object):
         return resp.content
 
     def register(self, project_name, version, group, appyaml):
-        url = '/app/%s/%s' % (project_name, version)
+        url = '/appversion/%s/%s' % (project_name, version)
         data = {'group': group, 'appyaml': appyaml}
         return self.request(url, method='POST', data=data, need_user=False)
 
     def add_container(self, app, host, daemon='false'):
-        url = '/app/%s/%s/add' % (app.name, app.version)
+        url = '/appversion/%s/%s/add' % (app.name, app.version)
         data = {'host': host.ip, 'daemon': daemon}
         return self.request(url, method='POST', data=data)
         
     def build_image(self, app, host, base):
-        url = '/app/%s/%s/build' % (app.name, app.version)
+        url = '/appversion/%s/%s/build' % (app.name, app.version)
         data = {'host': host.ip, 'base': base, 'group': app.application.namespace}
         return self.request(url, method='POST', data=data)
 
     def test_app(self, app, host):
-        url = '/app/%s/%s/test' % (app.name, app.version)
+        url = '/appversion/%s/%s/test' % (app.name, app.version)
         data = {'host': host.ip}
         return self.request(url, method='POST', data=data)
 
     def remove_app(self, app, host):
-        url = '/app/%s/%s/remove' % (app.name, app.version)
+        url = '/appversion/%s/%s/remove' % (app.name, app.version)
         data = {'host': host.ip}
         return self.request(url, method='POST', data=data)
 
     def update_app(self, app_name, from_version, to_version, hosts):
-        url = '/app/%s/%s/update' % (app_name, from_version)
+        url = '/appversion/%s/%s/update' % (app_name, from_version)
         data = {'to': to_version, 'hosts': hosts}
         return self.request(url, method='POST', data=data)
 
@@ -114,6 +114,11 @@ class DotClient(object):
         data = {'branch': branch}
         return self.request(url, method='PUT', data=data)
 
+    def add_sub_appyaml(self, app, app_yaml):
+        url = '/appversion/%s/%s/subappyaml' % (app.name, app.version)
+        data = {'appyaml', app_yaml}
+        return self.request(url, method='POST', data=data)
+
     def syncdb(self, app_name, schema):
         url = '/resource/%s/syncdb' % app_name
         data = {'schema': schema}
@@ -139,6 +144,10 @@ class DotClient(object):
             'limit': limit,
         }
         return self.request('/app', params=params)
+
+    def get_sub_appyamls(self, app):
+        url = '/appversion/%s/%s/subappyaml' % (app.name, app.version)
+        return self.request(url)
 
     def get_app_jobs(self, app_name, status=-1, succ=-1, start=0, limit=20):
         url = '/app/%s/jobs' % app_name
