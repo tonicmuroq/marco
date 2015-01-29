@@ -7,7 +7,7 @@ from marco.ext import dot
 
 class Container(object):
 
-    def __init__(self, id, container_id, port, host_id, ident_id, app_name, version):
+    def __init__(self, id, container_id, port, host_id, ident_id, app_name, version, sub_app):
         self.id = id
         self.container_id = container_id
         self.port = port
@@ -15,6 +15,7 @@ class Container(object):
         self.ident_id = ident_id
         self.app_name = app_name
         self.version = version
+        self.sub_app = sub_app
 
     @classmethod
     def get_by_container_id(cls, cid):
