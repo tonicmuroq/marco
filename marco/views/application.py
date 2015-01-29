@@ -1,5 +1,8 @@
 # coding: utf-8
+
+import re
 import json
+import yaml
 from flask import (Blueprint, Response, request, render_template,
         abort, g, redirect, url_for, jsonify)
 
@@ -112,8 +115,9 @@ def app_version(name, version):
     ptasks = app.processing_tasks(limit=5)
     tasks = app.tasks(limit=10)
     hosts = Host.all_hosts()
-    return render_template('/app/appversion.html', app=app,
-            ptasks=ptasks, tasks=tasks, hosts=hosts)
+    return render_template(
+        '/app/appversion.html', app=app, ptasks=ptasks, tasks=tasks,
+        hosts=hosts, sub_apps=dot.get_sub_appyamls(app))
 
 
 @bp.route('/<name>/<version>/jobs')
@@ -131,6 +135,29 @@ def single_version(name, version):
     hosts = Host.all_hosts()
     return render_template('/app/app.html', app=app,
             ptasks=ptasks, tasks=tasks, hosts=hosts)
+
+_SUB_NAME_CHECK = re.compile('^[a-zA-Z]+$')
+
+
+@bp.route('/<name>/<version>/addsub', methods=['POST'])
+def add_sub_app(name, version):
+    def split_lines(val):
+        return filter(None, [ln.strip() for ln in val.split('\n')])
+
+    app = _get_appversion(name, version)
+    subname = request.form['subname']
+    if not _SUB_NAME_CHECK.match(subname):
+        return 'invalid sub name', 400
+    dot.add_sub_appyaml(app, yaml.safe_dump({
+        'appname': app.name + '-' + subname,
+        'port': int(request.form['port']),
+        'runtime': request.form['runtime'],
+        'build': split_lines(request.form['build']),
+        'cmd': split_lines(request.form['cmd']),
+        'daemon': split_lines(request.form['daemon']),
+        'static': request.form['static'],
+    }, default_flow_style=False))
+    return ''
 
 
 @bp.before_request

@@ -71,7 +71,9 @@
         <span class="label label-success">version: {{container.version}}</span>
         <span class="label label-success">host: {{container.host.ip}}</span>
         <span class="label label-success">port: {{container.port}}</span>
-        <span class="label label-success">sub app: {{container.sub_app or container.app_name}}</span>
+        {% if container.sub_app %}
+        <span class="label label-success">sub app: {{container.sub_app}}</span>
+        {% endif %}
         <span class="glyphicon glyphicon-cloud-download"></span>
         {{container.container_id[:7]}} [ {{container.application.name}} ]
       </a>
