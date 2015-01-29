@@ -2,8 +2,9 @@ $('.btn-add-container').click(function() {
   var self = $(this),
       url = self.data('url'),
       daemon = $('#add-daemon').val(),
+      subApp = $('#select-sub-app').val(),
       host = $('#add-host').val();
-  $.post(url, {host_id: host, daemon: daemon}).fail(function (e){
+  $.post(url, {host_id: host, daemon: daemon, sub_app: subApp}).fail(function (e){
     alert('出错了');
   }).done(function(r) {
     if (!r.r) {
@@ -140,7 +141,7 @@ $('.btn-update-app').click(function() {
       url = self.data('url'),
       version = self.data('version');
   $.post(url, {to_version: version}, function(d) {
-    alert('更新成功, 坐等.');
+    alert('坐等更新');
   });
 });
 
@@ -148,4 +149,57 @@ $('.btn-add-mysql').click(function() {
   var self = $(this),
       url = self.data('url');
   $.post(url);
+});
+
+$('.btn-sub-apps').click(function() {
+    $('#sub-apps-panel').overlay({
+        title: '子应用设定'
+    });
+});
+
+$('#sub-app-create').click(function() {
+    if (! /^[a-zA-Z]+$/.test($('#sub-app-name').val())) {
+        $('#sub-app-error').text('不合法的子应用名, 子应用名只能包含字母');
+        return $('#sub-app-name').focus();
+    }
+    if (! /^[0-9]+$/.test($('#sub-app-port').val())) {
+        $('#sub-app-error').text('不合法的端口号');
+        return $('#sub-app-port').focus();
+    }
+    var port = parseInt($('#sub-app-port').val());
+    if (!(1024 < port && port < 65536)) {
+        $('#sub-app-error').text('端口号应该介于 1025 至 65535 之间');
+        return $('#sub-app-port').focus();
+    }
+    $('#sub-app-error').text('');
+
+    var self = $(this);
+    $.post(['', 'app', self.data('name'), self.data('version'), 'addsub'].join('/'),
+           $('#sub-apps-settings :input').toArray().reduce(function(obj, item) {
+               if (item.name) {
+                   obj[item.name] = item.value;
+               }
+               return obj;
+           }, {}),
+           function() {
+               window.location.reload();
+           });
+});
+
+$('.btn-sub-app-show').click(function() {
+    var sub = $(this).data('sub');
+    $('#sub-apps-settings :input').each(function() {
+        if (!this.name) {
+            return;
+        }
+        if (!sub[this.name]) {
+            return $(this).val('');
+        }
+        if (typeof sub[this.name] !== 'object') {
+            return $(this).val(sub[this.name]);
+        }
+        $(this).val(sub[this.name].join('\n'));
+    });
+    var subnames = sub.appname.split('-');
+    $('#sub-app-name').val(subnames[subnames.length - 1]);
 });

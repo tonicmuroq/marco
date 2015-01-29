@@ -38,6 +38,23 @@ def load_config(name):
         return yaml.load(f)
 
 
+def _json_dump(o):
+    def default(obj):
+        from datetime import datetime
+        if isinstance(obj, datetime):
+            return long(1000 * calendar.timegm(obj.timetuple()))
+        return obj
+    return json.dumps(o, default=default).replace(
+        '<', u'\\u003c').replace('>', u'\\u003e').replace(
+            '&', u'\\u0026').replace("'", u'\\u0027')
+
+
+def _join_textarea_content(ls):
+    if ls is None:
+        return ''
+    return '\n'.join(ls)
+
+
 def create_app():
     config = load_config('config.yaml')
     mysql_dsn = 'mysql://{username}:{password}@{host}:{port}/{db}'.format(**config['mysql'])
@@ -52,6 +69,8 @@ def create_app():
         SQLALCHEMY_POOL_RECYCLE=3600,
     )
     app.secret_key = 'wolegeca'
+    app.jinja_env.filters['tojson'] = _json_dump
+    app.jinja_env.filters['join_textarea_content'] = _join_textarea_content
 
     logging.basicConfig(format='%(levelname)s:%(asctime)s:%(message)s',
                         level=logging.INFO)

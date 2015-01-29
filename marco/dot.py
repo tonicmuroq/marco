@@ -36,13 +36,15 @@ class DotClient(object):
             return self._username
         raise RuntimeError('need username set')
 
-    def request(self, url, method='GET', params={}, data=None, json=True, expected_code=200, need_user=True):
+    def request(self, url, method='GET', params=None, data=None, json=True, expected_code=200, need_user=True):
         if method == 'GET':
             need_user = False
         # set user
         headers = {'NBE-user': self._get_username() if need_user else 'NBEBot'}
 
         # set start/limit if none
+        if params is None:
+            params = {}
         if 'start' not in params:
             params['start'] = 0
         if 'limit' not in params:
@@ -62,11 +64,11 @@ class DotClient(object):
         data = {'group': group, 'appyaml': appyaml}
         return self.request(url, method='POST', data=data, need_user=False)
 
-    def add_container(self, app, host, daemon='false'):
+    def add_container(self, app, host, daemon='false', sub_app=''):
         url = '/appversion/%s/%s/add' % (app.name, app.version)
-        data = {'host': host.ip, 'daemon': daemon}
+        data = {'host': host.ip, 'daemon': daemon, 'sub_app': sub_app}
         return self.request(url, method='POST', data=data)
-        
+
     def build_image(self, app, host, base):
         url = '/appversion/%s/%s/build' % (app.name, app.version)
         data = {'host': host.ip, 'base': base, 'group': app.application.namespace}
@@ -116,7 +118,7 @@ class DotClient(object):
 
     def add_sub_appyaml(self, app, app_yaml):
         url = '/appversion/%s/%s/subappyaml' % (app.name, app.version)
-        data = {'appyaml', app_yaml}
+        data = {'appyaml': app_yaml}
         return self.request(url, method='POST', data=data)
 
     def syncdb(self, app_name, schema):

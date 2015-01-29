@@ -66,7 +66,7 @@
           </div>
           <span class="label label-success" style="margin-left: 36px;">name: {{container.application.name}}</span>
         {% else %}
-          <span class="label label-success">name: {{container.app_name}}</span>
+          <span class="label label-success">name: {{container.sub_app or container.app_name}}</span>
         {% endif %}
         <span class="label label-success">version: {{container.version}}</span>
         <span class="label label-success">host: {{container.host.ip}}</span>

@@ -58,6 +58,18 @@
             <option value="true">用Daemon跑</option>
           </select>
         </div>
+        {% if sub_apps %}
+        <div class='form-group'>
+            <select id='select-sub-app' class='form-control'>
+                <option value=''>{{ app.name }}</option>
+                {% for sub_app in sub_apps %}
+                    <option value='{{ sub_app.appname }}'>{{ sub_app.appname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% else %}
+            <input id='select-sub-app' type='hidden' value=''>
+        {% endif %}
         <button type="button" class="btn btn-info btn-add-container" data-url="{{url_for('ajax.app_add_container', app_id=app.id)}}">增加容器</button>
       </form>
     </div>
@@ -66,6 +78,62 @@
     <div class="text-left app-block">
       <button type="button" class="btn btn-info btn-test-app" data-url="{{url_for('ajax.app_test_app', app_id=app.id)}}">测试应用</button>
       <button type="button" class="btn btn-warning btn-remove-container" data-url="{{url_for('ajax.app_remove_app', app_id=app.id)}}">下线应用</button>
+      <button type='button' class='btn btn-primary btn-sub-apps'>设定子应用</button>
+      <div id='sub-apps-panel' style='display: none'>
+          {% if sub_apps %}
+          <div style='width: 800px; margin: auto'>
+              <div style='font-weight: bolder; font-size: 1.8em; text-align: center'>子应用列表</div>
+              {% for sub_app in sub_apps %}
+                  <button class='btn btn-info btn-sub-app-show' data-sub='{{ sub_app|tojson }}' style='display: block; float: left; width: 120px; min-height: 4em; margin: 0.5em'>{{ sub_app.appname }}</button>
+              {% endfor %}
+          </div>
+          {% endif %}
+          <hr style='clear: both'>
+          <table style='margin: auto' id='sub-apps-settings'>
+              <caption style='font-weight: bolder; font-size: 1.8em'>设定子应用</caption>
+              <tr>
+                  <td>
+                      子应用名字
+                  </td>
+                  <td>
+                      <label style='font-family: monospace'>{{ app.name }}-</label><input style='height: 30px' type='text' name='subname' id='sub-app-name'>
+                      <br>
+                      <sup>如果此名字不存在, 则以该名字新建</sup>
+                  </td>
+              </tr>
+              <tr>
+                  <td colspan='2'>子应用配置</td>
+              </tr>
+              <tr>
+                  <td>端口</td>
+                  <td><input type='text' class='input-block-level' id='sub-app-port' name='port' style='min-width: 500px' value='5000'></td>
+              </tr>
+              <tr>
+                  <td>Runtime</td>
+                  <td><input type='text' class='input-block-level' name='runtime' value='{{ app.app_yaml.runtime|e }}'></td>
+              </tr>
+              <tr>
+                  <td>构建</td>
+                  <td><textarea class='input-block-level' name='build'>{{ app.app_yaml.build|join_textarea_content|e }}</textarea></td>
+              </tr>
+              <tr>
+                  <td>启动</td>
+                  <td><textarea class='input-block-level' name='cmd'>{{ app.app_yaml.cmd|join_textarea_content|e }}</textarea></td>
+              </tr>
+              <tr>
+                  <td>启动 daemon</td>
+                  <td><textarea class='input-block-level' name='daemon'>{{ app.app_yaml.daemon|join_textarea_content|e }}</textarea></td>
+              </tr>
+              <tr>
+                  <td>静态文件目录</td>
+                  <td><input type='text' class='input-block-level' name='static' value='{{ app.app_yaml.static|e }}'></td>
+              </tr>
+              <tr>
+                  <td><button class='btn btn-primary' id='sub-app-create' data-name='{{ app.name }}' data-version='{{ app.version }}'>设定子应用</button></td>
+                  <td><span id='sub-app-error' style='margin-left: 1em'></span></td>
+              </tr>
+          </table>
+      </div>
     </div>
   </div>
   <div class="row row-margin">
