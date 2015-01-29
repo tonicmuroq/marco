@@ -157,7 +157,7 @@ $('.btn-sub-apps').click(function() {
     });
 });
 
-$('#sub-app-create').click(function() {
+$('.sub-app-create').click(function() {
     if (! /^[a-zA-Z]+$/.test($('#sub-app-name').val())) {
         $('#sub-app-error').text('不合法的子应用名, 子应用名只能包含字母');
         return $('#sub-app-name').focus();
@@ -173,8 +173,9 @@ $('#sub-app-create').click(function() {
     }
     $('#sub-app-error').text('');
 
-    var self = $(this);
-    $.post(['', 'app', self.data('name'), self.data('version'), 'addsub'].join('/'),
+    var self = $(this),
+        u = $('input.sub-app-url');
+    $.post(['', 'app', u.data('name'), u.data('version'), 'addsub'].join('/'),
            $('#sub-apps-settings :input').toArray().reduce(function(obj, item) {
                if (item.name) {
                    obj[item.name] = item.value;
