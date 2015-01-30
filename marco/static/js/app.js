@@ -151,12 +151,6 @@ $('.btn-add-mysql').click(function() {
   $.post(url);
 });
 
-$('.btn-sub-apps').click(function() {
-    $('#sub-apps-panel').overlay({
-        title: '子应用设定'
-    });
-});
-
 $('.sub-app-create').click(function() {
     if (! /^[a-zA-Z]+$/.test($('#sub-app-name').val())) {
         $('#sub-app-error').text('不合法的子应用名, 子应用名只能包含字母');
@@ -188,6 +182,7 @@ $('.sub-app-create').click(function() {
 });
 
 $('.btn-sub-app-show').click(function() {
+    $('#sub-app-error').text('');
     var sub = $(this).data('sub');
     $('#sub-apps-settings :input').each(function() {
         if (!this.name) {
