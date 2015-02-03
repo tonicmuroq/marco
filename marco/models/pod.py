@@ -7,11 +7,34 @@ from marco.ext import db
 from marco.models.base import Base
 
 
-class UserPod(db.Model):
+class UserPod(Base):
 
+    __tablename__ = 'user_pod'
+
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('user.id'), primary_key=True)
     pod_id = db.Column(db.ForeignKey('pod.id'), primary_key=True)
+    core_quota = db.Column(db.Integer)
 
+    @cached_property
+    def core_quota_used(self):
+        from .host import Core
+        return db.session.query(Core).filter(
+            Core.pod_id == self.pod_id,
+            Core.occupier_user_id == self.user_id).count()
+
+    @classmethod
+    def change_quota(cls, id, core_quota):
+        p = db.session.query(cls).filter(cls.id == id).first()
+        if p is not None:
+            p.core_quota = core_quota
+            db.session.add(p)
+            db.session.commit()
+
+    @classmethod
+    def get_by_user_pod(cls, user_id, pod_id):
+        return db.session.query(cls).filter(
+            cls.user_id == user_id, cls.pod_id == pod_id).first()
 
 class Pod(Base):
 
@@ -19,6 +42,7 @@ class Pod(Base):
 
     name = db.Column(db.String(255), nullable=False, unique=True)
     users = db.relationship('User', secondary=UserPod.__table__)
+    user_pods = db.relationship(UserPod)
 
     @classmethod
     def create(cls, name):
@@ -80,6 +104,11 @@ class Pod(Base):
         if not dots:
             return ''
         return dots[0].ws_url
+
+    @cached_property
+    def free_cores_in_pod(self):
+        from .host import Host
+        return [len(h.free_cores) for h in Host.all_hosts()]
 
     def add_user(self, user):
         if not user:
@@ -156,3 +185,6 @@ class Dot(Base):
     def ws_url(self):
         parsed = urlparse(self.url)
         return 'ws://%s:%s' % (parsed.hostname, parsed.port)
+
+UserPod.user = db.relationship(User)
+UserPod.pod = db.relationship(Pod)

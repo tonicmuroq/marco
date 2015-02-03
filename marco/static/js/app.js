@@ -3,14 +3,21 @@ $('.btn-add-container').click(function() {
       url = self.data('url'),
       daemon = $('#add-daemon').val(),
       subApp = $('#select-sub-app').val(),
-      host = $('#add-host').val();
-  $.post(url, {host_id: host, daemon: daemon, sub_app: subApp}).fail(function (e){
-    alert('出错了');
+      retains = $('#cores-retain-btn').data('strategy');
+  $.post(url, {
+      daemon: daemon,
+      sub_app: subApp,
+      retain: retains.retain ? 'true' : '',
+      cores: retains.cores,
+      containers: retains.containers
+  }).fail(function (e){
+      alert('出错了');
   }).done(function(r) {
     if (!r.r) {
       alert('添加成功, 稍等');
       window.location.reload();
     } else {
+      console.log(r);
       alert('有什么错');
     }
   });
@@ -198,4 +205,88 @@ $('.btn-sub-app-show').click(function() {
     });
     var subnames = sub.appname.split('-');
     $('#sub-app-name').val(subnames[subnames.length - 1]);
+});
+
+$('#cores-retain').on('shown.bs.modal', function() {
+    var strategy = $('#cores-retain-btn').data('strategy');
+    var pod = $('#select-pod :selected');
+    var availableCores = $('#freecores').data('freecores');
+    var quota = $('#corequota').data('quota');
+    var maxCore = Math.min(Math.max.apply(null, availableCores), quota);
+
+    function maxInstances(coresPerContainer) {
+        var m = 0;
+        for (var i = 0; i < availableCores.length; ++i) {
+            m += Math.floor(availableCores[i] / coresPerContainer);
+        }
+        return Math.min(m, Math.floor(quota / coresPerContainer));
+    }
+
+    function setupContainerCountSlider(coresPerContainer, initValue) {
+        initValue = initValue || 1;
+        $('#cores-retain-core-count-display').text(coresPerContainer);
+        $('#cores-retain-container-count-display').text(initValue);
+        $('#cores-retain-container-count').slider({
+            range: 'min',
+            min: 1,
+            max: maxInstances(coresPerContainer),
+            value: initValue,
+            slide: function(event, ui) {
+                $('#cores-retain-container-count-display').text(ui.value);
+            },
+            change: function(event, ui) {
+                $(this).data('value', ui.value);
+            }
+        }).data('value', initValue);
+    }
+
+    function setupCoresCountSlider(initValue) {
+        $('#cores-retain-core-count').slider({
+            range: 'min',
+            min: 1,
+            max: maxCore,
+            value: initValue || 1,
+            slide: function(event, ui) {
+                setupContainerCountSlider(ui.value);
+            },
+            change: function(event, ui) {
+                $(this).data('value', ui.value);
+            }
+        }).data('value', initValue);
+    }
+
+    $('#cores-retain-pod-name').text(pod.text());
+
+    if (!strategy.retain) {
+        $('#cores-retain-check').prop('checked', false);
+        $('#cores-retain-panel').css('visibility', 'hidden');
+
+        setupCoresCountSlider(1)
+        setupContainerCountSlider(1);
+    } else {
+        var coresPerContainer = Math.min(maxCore, strategy.cores);
+        setupCoresCountSlider(coresPerContainer);
+        setupContainerCountSlider(coresPerContainer, Math.min(maxInstances(coresPerContainer), strategy.containers));
+    }
+});
+
+$('.setup-cores-retain').click(function() {
+    if (!$('#cores-retain-check').prop('checked')) {
+        $('#cores-retain-brief').text('非独占');
+        $('#cores-retain-btn').data('strategy', {retain: false});
+        return $('#cores-retain').modal('hide');
+    }
+    var cores = $('#cores-retain-core-count').data('value');
+    var containers = $('#cores-retain-container-count').data('value');
+    $('#cores-retain-brief').text(cores + ' 核 x ' + containers + ' 个容器');
+    $('#cores-retain-btn').data('strategy', {
+        cores: cores,
+        containers: containers,
+        retain: true
+    });
+    $('#cores-retain').modal('hide');
+});
+
+$('#cores-retain-check').change(function() {
+    $('#cores-retain-panel').css('visibility', $(this).prop('checked') ? 'visible' : 'hidden');
 });

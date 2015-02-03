@@ -44,14 +44,7 @@
   </div>
   <div class="row row-margin">
     <div class="text-left app-block">
-      <form class="form-inline" role="form">
-        <div class="form-group">
-          <select id="add-host" class="form-control">
-            {% for host in hosts %}
-            <option value="{{host.id}}">{{host.ip}}</option>
-            {% endfor %}
-          </select>
-        </div>
+      <div class="form-inline">
         <div class="form-group">
           <select id="add-daemon" class="form-control">
             <option value="false">不用Daemon</option>
@@ -70,8 +63,29 @@
         {% else %}
             <input id='select-sub-app' type='hidden' value=''>
         {% endif %}
+        {% if core_quota %}
+        <input id='freecores' type='hidden' data-freecores='{{ free_cores|tojson }}'>
+        <input id='corequota' type='hidden' data-quota='{{ core_quota|tojson }}'>
+        <div class="form-group">
+          <button id='cores-retain-btn' class='btn btn-primary' data-toggle="modal" data-target='#cores-retain' data-strategy='{"retain":false}'>独占策略: <span id='cores-retain-brief'>非独占</span></button>
+          {% call utils.modal('cores-retain', '设定独占策略', '确定', '取消', 'setup-cores-retain', sync=False) %}
+            <label><input type='checkbox' id='cores-retain-check'> 以 CPU 独占方式运行容器</label>
+            <div id='cores-retain-panel'>
+                <label>独占于集群 <b id='cores-retain-pod-name'></b> 上的 CPU</label>
+                <div style='clear: both'></div>
+                  <div style='width: 30%; float: left'>每个容器占有核数: <span id='cores-retain-core-count-display'><span></div>
+                  <div id='cores-retain-core-count' style='margin: 8px; width: 40%; float: left'></div>
+                <div style='clear: both'></div>
+                <div style='clear: both'></div>
+                  <div style='width: 30%; float: left'>容器数: <span id='cores-retain-container-count-display'><span></div>
+                  <div id='cores-retain-container-count' style='margin: 8px; width: 40%; float: left'></div>
+                <div style='clear: both'></div>
+            </div>
+          {% endcall %}
+        </div>
+        {% endif %}
         <button type="button" class="btn btn-info btn-add-container" data-url="{{url_for('ajax.app_add_container', app_id=app.id)}}">增加容器</button>
-      </form>
+      </div>
     </div>
   </div>
   <div class="row row-margin">

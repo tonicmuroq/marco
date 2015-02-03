@@ -71,9 +71,11 @@ DROP TABLE IF EXISTS `user_pod`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_pod` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `pod_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`pod_id`),
+  `core_quota` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
   KEY `pod_id` (`pod_id`),
   CONSTRAINT `user_pod_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `user_pod_ibfk_2` FOREIGN KEY (`pod_id`) REFERENCES `pod` (`id`)
@@ -90,3 +92,18 @@ CREATE TABLE `user_pod` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2014-12-24 11:13:36
+
+DROP TABLE IF EXISTS `host_core`;
+CREATE TABLE `host_core` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  `cpu_id` varchar(8) NOT NULL,
+  `host_id` int(11) NOT NULL,
+  `pod_id` int(11) NOT NULL,
+  `exclusive_uuid` varchar(255),
+  `bound_task` int(11),
+  `occupier_container_id` varchar(255),
+  `occupier_user_id` int(11),
+  CONSTRAINT `core_ibfk_1` FOREIGN KEY (`pod_id`) REFERENCES `pod` (`id`),
+  CONSTRAINT `core_ibfk_2` FOREIGN KEY (`occupier_user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
