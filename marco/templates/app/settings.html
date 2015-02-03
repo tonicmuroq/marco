@@ -46,6 +46,20 @@
   {% endcall %}
   {% call utils.panel_div('default', 'Zipkin') %}
     <input type="checkbox" name="zipkin" data-on-color="info" {{'checked' if zipkin else '' | safe}}>
+    <div style="margin-top:10px;">
+    <p>选择采样率, 默认为100(每100个请求采样一次)</p>
+    <form class="form-horizontal" style="margin-left:-90px;" action="{{url_for('app.set_zipkin_rate', name=app.name)}}" method="POST">
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="">采样率</label>
+            <div class="col-sm-2">
+                <input class="form-control" type="number" name="rate" value="{{app.zipkin_rate}}">
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">确定</button>
+            </div>
+        </div>
+    </form>
+    </div>
   {% endcall %}
 {% endblock %}
 

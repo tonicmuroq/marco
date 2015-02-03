@@ -85,6 +85,21 @@ class Application(object):
             logging.exception(e)
             return {'data': [], 'name': ''}
 
+    @property
+    def zipkin_rate(self):
+        try:
+            r = etcd.get('/sample/%s' % self.name)
+            return int(r.value)
+        except:
+            return 0
+        
+    @zipkin_rate.setter
+    def zipkin_rate(self, v):
+        try:
+            etcd.set('/sample/%s' % self.name, v)
+        except:
+            pass
+
 class AppVersion(object):
 
     def __init__(self, id, name, version, created, image_addr, app_yaml):
