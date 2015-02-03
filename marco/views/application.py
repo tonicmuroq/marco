@@ -109,6 +109,14 @@ def use_zipkin(name):
     return jsonify({'r': r})
 
 
+@bp.route('/<name>/settings/zipkin_rate', methods=['POST'])
+def set_zipkin_rate(name):
+    app = Application.get_by_name(name)
+    if app:
+        app.zipkin_rate = request.form.get('rate', type=int, default=0)
+    return redirect(url_for('app.settings', name=name))
+
+
 @bp.route('/<name>/<version>/')
 def app_version(name, version):
     app = _get_appversion(name, version)
