@@ -1,0 +1,36 @@
+{% extends '/ui.html' %}
+{% import '/utils.html' as utils %}
+
+{% block main_right %}
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Host</td>
+        <th>Cores (Free / Total)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for host in hosts %}
+      <tr>
+        <td><a href='{{url_for('host_adm.one', host_id=host.id)}}'>{{ host.ip|e }}</a></td>
+        <td>{{ host.free_cores|length }} / {{ host.cores|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% call utils.panel_div('default', '增加一个节点') %}
+    <form class='form-horizontal' role='form' action='{{ url_for('host_adm.add_host') }}' method='post'>
+      <div class='form-group'>
+        <label class='col-sm-2 control-label'>Host</label>
+        <div class='col-sm-10'>
+          <input type='text' class='form-control' name='host'>
+        </div>
+      </div>
+      <div class='form-group'>
+        <div class='col-sm-offset-2 col-sm-10'>
+          <button type='submit' class='btn btn-default'>增加</button>
+        </div>
+      </div>
+    </form>
+  {% endcall %}
+{% endblock %}

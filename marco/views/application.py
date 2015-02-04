@@ -7,7 +7,8 @@ from flask import (Blueprint, Response, request, render_template,
         abort, g, redirect, url_for, jsonify)
 
 from marco.ext import openid2, dot
-from marco.models.host import Host
+from marco.models.host import Host, Core
+from marco.models.pod import Pod, UserPod
 from marco.models.application import Application, AppVersion, get_config_yaml, set_config_yaml
 
 
@@ -27,6 +28,7 @@ def index():
 
 
 @bp.route('/<name>/jobs')
+@Core.try_bind_container
 def job_history(name):
     app = Application.get_by_name(name)
     tasks = app.tasks()
@@ -53,6 +55,7 @@ def collect(name):
 
 
 @bp.route('/<name>/')
+@Core.try_bind_container
 def app_set_info(name):
     app = Application.get_by_name(name)
     if not app:
@@ -118,14 +121,21 @@ def set_zipkin_rate(name):
 
 
 @bp.route('/<name>/<version>/')
+@Core.try_bind_container
 def app_version(name, version):
     app = _get_appversion(name, version)
     ptasks = app.processing_tasks(limit=5)
     tasks = app.tasks(limit=10)
     hosts = Host.all_hosts()
+
+    user_pod = UserPod.get_by_user_pod(g.user.id, g.pod.id)
+    core_quota = 0
+    if user_pod is not None:
+        core_quota = user_pod.core_quota - user_pod.core_quota_used
     return render_template(
         '/app/appversion.html', app=app, ptasks=ptasks, tasks=tasks,
-        hosts=hosts, sub_apps=dot.get_sub_appyamls(app))
+        hosts=hosts, free_cores=g.pod.free_cores_in_pod,
+        core_quota=core_quota, sub_apps=dot.get_sub_appyamls(app))
 
 
 @bp.route('/<name>/<version>/jobs')

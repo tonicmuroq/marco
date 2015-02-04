@@ -1,4 +1,9 @@
 {% extends "/ui.html" %}
+{% block more_css %}
+tbody td {
+    vertical-align: middle !important;
+}
+{% endblock more_css %}
 {% import "/utils.html" as utils %}
 
 {% block main_right %}
@@ -8,18 +13,34 @@
         <td>Name</td>
         <td>Email</td>
         <td>Admin</td>
+        <td>Core Quota (Used / Total)</td>
       </tr>
     </thead>
     <tbody>
-      {% for user in pod.users %}
+      {% for up in pod.user_pods %}
       <tr>
-        <td>{{user.name}}</td>
-        <td>{{user.email}}</td>
-        <td>{{user.is_admin()}}</td>
+        <td>{{up.user.name}}</td>
+        <td>{{up.user.email}}</td>
+        <td>{{up.user.is_admin()}}</td>
+        <td>
+            {{up.core_quota_used}} / {{up.core_quota}}
+            {% if g.user.is_admin() %}
+                <input type='text'><button class='btn btn-primary btn-change-quota' data-upid='{{ up.id }}'>Change Quota</button>
+            {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  <script>
+    $('.btn-change-quota').click(function() {
+        var idUserPod = $(this).data('upid');
+        var coreQuota = $(this).attr('disabled', 'disabled').prev().val();
+        $.post('/pod/pod/change_quota', {user_pod: idUserPod, core_quota: coreQuota}
+            ).success(function() {window.location.reload()}
+            ).error(function() {window.location.reload()});
+    });
+  </script>
   {% call utils.panel_div('default', '增加一个用户') %}
     <form class="form-horizontal" role="form" action="{{url_for('pod.pod_user', pod_id=pod.id)}}" method="post">
       <div class="form-group">

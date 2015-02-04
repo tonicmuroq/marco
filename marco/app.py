@@ -18,6 +18,7 @@ blueprints = (
     'ajax',
     'index',
     'host',
+    'host_adm',
     'hook',
     'task',
     'application',

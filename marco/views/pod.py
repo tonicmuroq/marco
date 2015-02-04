@@ -3,7 +3,7 @@ from flask import (Blueprint, request, render_template,
         abort, g, redirect)
 
 from marco.ext import openid2
-from marco.models.pod import Pod, User, Dot
+from marco.models.pod import Pod, User, Dot, UserPod
 
 
 bp = Blueprint('pod', __name__, url_prefix='/pod')
@@ -56,6 +56,13 @@ def pod_dot(pod_id):
         if dot_url:
             Dot.create(dot_url, pod_id, es, etcd, influxdb)
     return render_template('/pod/pod_dot.html', pod=pod)
+
+
+@bp.route('/pod/change_quota', methods=['POST'])
+def change_pod_quota():
+    UserPod.change_quota(int(request.form['user_pod']),
+                         int(request.form['core_quota']))
+    return ''
 
 
 @bp.before_request

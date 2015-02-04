@@ -64,10 +64,15 @@ class DotClient(object):
         data = {'group': group, 'appyaml': appyaml}
         return self.request(url, method='POST', data=data, need_user=False)
 
-    def add_container(self, app, host, daemon='false', sub_app=''):
+    def add_container(self, app, host, daemon='false', sub_app='',
+                      cores_retain=None):
         url = '/appversion/%s/%s/add' % (app.name, app.version)
-        data = {'host': host.ip, 'daemon': daemon, 'sub_app': sub_app}
-        return self.request(url, method='POST', data=data)
+        return self.request(url, method='POST', data={
+            'host': host.ip,
+            'daemon': daemon,
+            'sub_app': sub_app,
+            'cores': cores_retain,
+        })['task_id']
 
     def build_image(self, app, host, base):
         url = '/appversion/%s/%s/build' % (app.name, app.version)

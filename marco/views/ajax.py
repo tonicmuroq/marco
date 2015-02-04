@@ -1,9 +1,11 @@
 # coding: utf-8
 
+import random
 from flask import Blueprint, request, g
 
 from marco.ext import dot, gitlab
-from marco.models.host import Host
+from marco.models.host import Host, Core
+from marco.models.pod import UserPod
 from marco.models.container import Container
 from marco.models.application import AppVersion, Application
 
@@ -57,15 +59,46 @@ def app_all_metric(appname):
 
 @bp.route('/app/<app_id>/add', methods=['POST', ])
 @jsonify
+@Core.try_bind_container
 def app_add_container(app_id):
-    host = Host.get(request.form['host_id'])
-    if not host:
-        return {'r': 1, 'msg': 'no such host'}
-
     daemon = request.form.get('daemon', 'false')
     sub_app = request.form.get('sub_app', '')
-    app = _get_app(app_id, validate_process=True)
-    return dot.add_container(app, host, daemon, sub_app)
+    app = _get_app(app_id, validate_process=False)
+
+    if not request.form.get('retain'):
+        host = random.choice(Host.all_hosts())
+        return dot.add_container(app, host, daemon, sub_app)
+
+    try:
+        core_count = int(request.form['cores'])
+        container_count = int(request.form['containers'])
+    except ValueError, e:
+        return 'invalid argument (%s)' % e.message, 400
+
+    user_pod = UserPod.get_by_user_pod(g.user.id, g.pod.id)
+    if (user_pod is None or user_pod.core_quota - user_pod.core_quota_used
+            < core_count * container_count):
+        return 'insufficient core quota', 400
+
+    hosts = sorted(Host.all_hosts(), key=lambda h: len(h.free_cores))
+    container_hosts = []
+    cores = []
+    for h in hosts:
+        n = min(len(h.free_cores) / core_count,
+                container_count - len(container_hosts))
+        cores.extend(h.free_cores[:n * core_count])
+        container_hosts.extend(
+            [(h, h.free_cores[i * core_count: (i + 1) * core_count])
+             for i in xrange(n)])
+        if len(container_hosts) == container_count:
+            break
+
+    exc_uuid = Core.occupy_cores(cores, g.user.id)
+    for h, cores in container_hosts:
+        task_id = dot.add_container(app, h, daemon, sub_app,
+                                    [c.cpu_id for c in cores])
+        Core.bind_to_task(cores, task_id)
+    return ''
 
 
 @bp.route('/app/<app_id>/build', methods=['POST', ])
@@ -125,6 +158,7 @@ def app_sync_db(app_id):
 
 @bp.route('/container/remove', methods=['POST', ])
 @jsonify
+@Core.try_bind_container
 def remove_containers():
 
     def _filter_container(c):
@@ -133,13 +167,13 @@ def remove_containers():
         # XD
         if g.user.username == 'tonic':
             return True
-        if c.application.name in ('marco', 'openids'):
-            return False
+        return c.application.name not in ('marco', 'openids')
 
     cids = request.form.getlist('cids[]')
     cs = [Container.get_by_container_id(cid) for cid in cids if cid]
     for c in filter(_filter_container, cs):
         dot.remove_container(c)
+        Core.retire_cores_in_container(c.container_id)
     return {'r': 0, 'msg': 'ok'}
 
 
